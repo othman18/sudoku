@@ -16,9 +16,7 @@ void push(struct stack *stack_head, int val){
 
 int pop(struct stack *stack_head){
     if(stack_head == NULL || stack_head->stack_top == NULL){
-		printf("\033[0;31m");
-		printf("empty stack\n");
-		printf("\033[0m");
+		printf("\033[0;31m empty stack\n\033[0m");
 		exit(EXIT_FAILURE);
     }
 	int ret_val = stack_head->stack_top->val;

@@ -22,7 +22,7 @@ stack.o: utils/stack.h
 board.o: board.h
 	$(CC) $(COMP_FLAGS) -c $*.c
 
-main.o: board.o
+main.o: board.h utils/stack.c
 	$(CC) $(COMP_FLAGS) -c $*.c
 
 

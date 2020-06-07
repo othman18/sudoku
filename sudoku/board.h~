@@ -4,6 +4,7 @@
 
 #ifndef BOARD_H_
 #define BOARD_H_
+#define PRINT_RED(str) printf("\033[0;31m"); printf(str); printf("\033[0m");
 
 struct cell{
 	bool fixed;
@@ -11,11 +12,10 @@ struct cell{
 }; 
 
 
-//cell ***board;
-
 cell* init_cell();
 void init_board(int board_size);
 void delete_board();
-
+void print_board();
+void set_move(int val, int x, int y);
 #endif
 

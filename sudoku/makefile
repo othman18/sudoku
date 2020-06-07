@@ -12,7 +12,6 @@ all: $(EXEC)
 $(EXEC): $(OBJS)
 	$(CC) $(OBJS) $(GUROBI_LIB) -o $@ -lm
 
-
 linkedlist.o: utils/linkedlist.h
 	$(CC) $(COMP_FLAGS) -c utils/linkedlist.c
 
@@ -22,7 +21,7 @@ stack.o: utils/stack.h
 board.o: board.h
 	$(CC) $(COMP_FLAGS) -c $*.c
 
-main.o: board.h
+main.o: board.h utils/stack.c
 	$(CC) $(COMP_FLAGS) -c $*.c
 
 
