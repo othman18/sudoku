@@ -1,3 +1,4 @@
+//board.c
 #include "board.h"
 #include <stdio.h>
 
@@ -5,8 +6,10 @@
 /* global variables */
 cell ***glob_board = NULL;
 int glob_board_size = 0;
+linkedlist *glob_move_history = NULL;
 
 
+/* init a cell with read/write mode and a default value = 0 */
 cell* init_cell(){
 	struct cell *new_cell = (struct cell*) malloc(sizeof(struct cell));
 	new_cell->val = 0;
@@ -15,11 +18,12 @@ cell* init_cell(){
 }
 
 
+///////////////////////////////////////BOARD METHODS////////////////////////////
+
+
 void init_board(int board_size){
 	if(board_size < 2){
-		PRINT_RED;
-		printf("board size can't be lower than 2\n");
-		PRINT_NORMAL;
+		printf(RED "board size can't be lower than 2\n" DEFAULT);
 		return;
 	}
 	glob_board_size = board_size;
@@ -47,16 +51,14 @@ void delete_board(){
 		}
 		free(glob_board[i]);
 	}
-	
+	delete_linkedlist(&glob_move_history);
 	free(glob_board);
 }
 
 
 void print_board(){
 	if(glob_board == NULL){
-		PRINT_RED;
-		printf("board not init\n");
-		PRINT_NORMAL;
+		printf(RED "board not init\n" DEFAULT);
 		return;		
 	}
 
@@ -84,10 +86,14 @@ void print_board(){
 }
 
 
+///////////////////////////////////////MOVE METHODS/////////////////////////////
+
+
 /* check if move is in bounds */
 bool valid_move(int val, int x, int y){
 	bool valid_b = true;
-	PRINT_RED;
+	printf(RED);
+	
 	if(glob_board == NULL){
 		printf("board not init\n");
 		valid_b = false;
@@ -101,10 +107,9 @@ bool valid_move(int val, int x, int y){
 		valid_b = false;
 	}
 	else if(val < 1 || val > glob_board_size){
-		PRINT_RED;
 		valid_b = false;
 	}
-	PRINT_NORMAL;
+	printf(DEFAULT);
 	return valid_b;
 }
 
@@ -119,21 +124,16 @@ void set_move(int val, int x, int y){
 		case 0:
 			glob_board[x][y]->val = val;
 			glob_board[x][y]->mode = 1;
+			insert_history(val, x, y);
 			break;
 		case 1:
-			PRINT_RED;
-			printf("invalid move, cell[%d][%d] was already set, use edit to modify cell\n", x, y);
-			PRINT_NORMAL;
+			printf(RED "invalid move, cell[%d][%d] was already set, use edit to modify cell\n" DEFAULT, x, y);
 			break;
 		case 2:
-			PRINT_RED;
-			printf("invalid move, cell[%d][%d] has a fixed value\n", x, y);
-			PRINT_NORMAL;
+			printf(RED "invalid move, cell[%d][%d] has a fixed value\n" DEFAULT, x, y);
 			break;
 		default:
-			PRINT_RED;
-			printf("invalid cell mode\n");
-			PRINT_NORMAL;
+			printf(RED "invalid cell mode\n" DEFAULT);
 	}
 }
 
@@ -143,7 +143,51 @@ void edit_move(int val, int x, int y){
 	if(!valid_move(val, x, y)){
 		return;
 	}
+	if(val == glob_board[x][y]->val){
+		// same value, won't have to call set_move
+		return;
+	}
 	glob_board[x][y]->mode = 0;
 	set_move(val, x, y);
 }
+
+
+/* remove board[x][y], give it: read/write mode and a default value = 0 */
+void remove_move(int x, int y){
+	if(!valid_move(1, x, y)){
+		return;
+	}
+	glob_board[x][y]->mode = 0;
+	glob_board[x][y]->val = 0;
+}
+
+
+///////////////////////////////////////HISTORY METHODS//////////////////////////
+
+
+void insert_history(int val, int x, int y){
+	if(glob_move_history == NULL){
+		init_linkedlist(&glob_move_history, val, x, y);
+		return;
+	}
+	insert_node(glob_move_history, val, x, y);
+}
+
+void remove_history(){
+	remove_node(glob_move_history);
+}
+
+
+void undo_move(){
+	
+}
+
+
+void redo_move(){
+
+}
+
+
+
+
 

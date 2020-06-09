@@ -1,3 +1,4 @@
+#if 0
 #include "stack.h"
 
 
@@ -37,4 +38,4 @@ void delete_stack(struct stack **stack_head){
 	free(*stack_head);
 	stack_head = NULL;
 }
-
+#endif
