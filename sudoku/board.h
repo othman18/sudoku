@@ -13,7 +13,7 @@ struct cell{
 };
 
 
-cell* init_cell();
+struct cell* init_cell();
 
 /* modify board methods */
 void init_board(int board_size);

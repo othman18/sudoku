@@ -14,6 +14,18 @@ void init_node(struct node **head, int val, int x, int y, struct node *next, str
 }
 
 
+void remove_node(struct node **head){
+    if(head == NULL || *head == NULL){
+        return;
+    }
+    if((*head)->prev != NULL){
+        (*head)->prev->next = (*head)->next;
+    }
+    free(*head);
+    head = NULL;
+}
+
+
 void init_linkedlist(struct linkedlist **lst, int val, int x, int y){
 	if(*lst == NULL){
 		*lst = (struct linkedlist*)malloc(sizeof(struct linkedlist));
@@ -23,7 +35,7 @@ void init_linkedlist(struct linkedlist **lst, int val, int x, int y){
 }
 
 
-void insert_node(struct linkedlist *lst, int val, int x, int y){
+void insert_head_linkedlist(struct linkedlist *lst, int val, int x, int y){
 	if(lst == NULL || lst->head == NULL){
 		return;
 	}
@@ -36,7 +48,7 @@ void insert_node(struct linkedlist *lst, int val, int x, int y){
 }
 
 
-void remove_node(struct linkedlist *lst){
+void remove_head_linkedlist(struct linkedlist *lst){
 	if(lst == NULL || lst->head == NULL){
 		printf(RED "error, empty list!\n" DEFAULT);
 		return;
@@ -54,10 +66,27 @@ void delete_linkedlist(struct linkedlist **lst){
 	}
 
 	while((*lst)->head != NULL){
-		remove_node(*lst);
+		remove_head_linkedlist(*lst);
 	}
 
 	free(*lst);
 	lst = NULL;
 }
 
+
+void print_linkedlist(struct linkedlist *lst){
+    if(lst == NULL || lst->head == NULL){
+        return;
+    }
+
+    struct node *current_node = lst->head;
+    while(current_node->prev != NULL){
+        current_node = current_node->prev;
+    }
+    while(current_node != NULL){
+        printf("%d ", current_node->val);
+        current_node = current_node->next;
+    }
+    printf("\n");
+
+}

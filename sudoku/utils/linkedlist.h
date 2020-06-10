@@ -16,13 +16,17 @@ struct node{
 };
 
 struct linkedlist{
-	struct node *head;
+    struct node *head; // newly added element becomes the head
+    struct node *tail; // first element becomes the tail
 };
 
 void init_node(struct node **head, int val, int x, int y, struct node *next, struct node *prev);
+void remove_node(struct node **head);
+
 void init_linkedlist(struct linkedlist **lst, int val, int x, int y);
-void insert_node(struct linkedlist *lst, int val, int x, int y);
-void remove_node(struct linkedlist *lst);
+void insert_head_linkedlist(struct linkedlist *lst, int val, int x, int y);
+void remove_head_linkedlist(struct linkedlist *lst);
 void delete_linkedlist(struct linkedlist **lst);
+void print_linkedlist(struct linkedlist *lst);
 #endif /*LINKEDLIST_H_*/
 

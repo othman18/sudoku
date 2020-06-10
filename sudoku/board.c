@@ -170,11 +170,11 @@ void insert_history(int val, int x, int y){
 		init_linkedlist(&glob_move_history, val, x, y);
 		return;
 	}
-	insert_node(glob_move_history, val, x, y);
+	insert_head_linkedlist(glob_move_history, val, x, y);
 }
 
 void remove_history(){
-	remove_node(glob_move_history);
+	
 }
 
 
