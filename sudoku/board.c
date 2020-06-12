@@ -62,7 +62,6 @@ void board_free(){
 
 
 void board_print(){
-    // TODO: fix this statement
 	if(glob_board == NULL){
 		printf(RED "board not init\n" DEFAULT);
 		return;		
@@ -96,7 +95,7 @@ void board_print(){
 
 
 /* check if move is in bounds */
-bool move_valid(int val, int x, int y){
+bool move_is_valid(int val, int x, int y){
 	bool valid_b = true;
 	printf(RED);
 	
@@ -122,7 +121,7 @@ bool move_valid(int val, int x, int y){
 
 /* set move on board only if the cell is modifiable*/
 void move_set(int val, int x, int y){
-	if(!move_valid(val, x, y)){
+	if(!move_is_valid(val, x, y)){
 		return;
 	}
 	
@@ -146,7 +145,7 @@ void move_set(int val, int x, int y){
 
 /* set move on board if the cell was already set*/
 void move_edit(int val, int x, int y){
-	if(!move_valid(val, x, y)){
+	if(!move_is_valid(val, x, y)){
 		return;
 	}
 	if(val == glob_board[x][y]->val){
@@ -160,7 +159,7 @@ void move_edit(int val, int x, int y){
 
 /* remove board[x][y], give it: read/write mode and a default value = 0 */
 void move_remove(int x, int y){
-	if(!move_valid(1, x, y)){
+	if(!move_is_valid(1, x, y)){
 		return;
 	}
 	glob_board[x][y]->mode = 0;
@@ -169,12 +168,27 @@ void move_remove(int x, int y){
 
 
 void move_undo(){
-    
+    if(!linkedlist_rewind_current(glob_move_history)){
+		printf(RED "no more moves to undo\n" DEFAULT);
+		return;
+	}
+	struct node *prev_move = glob_move_history->current_move->next;
+	move_remove(prev_move->x, prev_move->y);
+//	board_print();
 }
 
 
+/* restore prev move and set it. We don't need to check the move, since this is 
+   a previously inserted move, which was already validated*/
 void move_redo(){
-
+	if(!linkedlist_forward_current(glob_move_history)){
+		printf(RED "no more moves to redo\n" DEFAULT);
+		return;
+	}
+	struct node *prev_move = glob_move_history->current_move;
+	glob_board[prev_move->x][prev_move->y]->val = prev_move->val;
+	glob_board[prev_move->x][prev_move->y]->mode = 1;
+//	board_print();
 }
 
 
@@ -189,8 +203,11 @@ void history_insert(int val, int x, int y){
 	linkedlist_insert(glob_move_history, val, x, y);
 }
 
-void history_remove(){
-	// create a current node inside the history structure and move the pointer as needed
-    // when removing the history, simply pass the current node and delete all of its nexts
+
+void history_print(){
+	printf("Move history: ");
+	linkedlist_print_until_current(glob_move_history);
 }
+//void history_remove(){}
+
 

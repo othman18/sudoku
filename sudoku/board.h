@@ -1,6 +1,5 @@
 // board.h
 #include <stdlib.h>
-#include <stdbool.h>
 #include "utils/linkedlist.h"
 
 
@@ -21,7 +20,7 @@ void board_free();
 void board_print();
 
 /* move methods */
-bool move_valid(int x, int y);
+bool move_is_valid(int x, int y);
 void move_set(int val, int x, int y);
 void move_edit(int val, int x, int y);
 void move_remove(int x, int y);
@@ -30,6 +29,7 @@ void move_redo();
 
 /* modify history methods*/
 void history_insert(int val, int x, int y);
-void history_remove();
+void history_print();
+//void history_remove();
 
 #endif

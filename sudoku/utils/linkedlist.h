@@ -1,6 +1,7 @@
 // linkedlist.h
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 
 #ifndef LINKEDLIST_H_
@@ -16,16 +17,24 @@ struct node{
 };
 
 struct linkedlist{
-    struct node *head;
-    struct node *tail;
+    struct node *head, *tail,
+    	*current_move; // pointer to the current move in the move history
 };
 
-void init_node(struct node **head, int val, int x, int y, struct node *next, struct node *prev);
+/* node methods*/
+void node_init(struct node **new_node, int val, int x, int y, struct node *next,
+	struct node *prev);
+void node_free(struct node *delete_node);
 
+/* linkedlist methods */
 void linkedlist_init(struct linkedlist **lst, int val, int x, int y);
 void linkedlist_insert(struct linkedlist *lst, int val, int x, int y);
-void linkedlist_remove(struct linkedlist *lst);
-void linkedlist_free(struct linkedlist **lst);
+void linkedlist_remove_last(struct linkedlist *lst);
+void linkedlist_remove_until_current(struct linkedlist *lst);
+bool linkedlist_forward_current(struct linkedlist *lst);
+bool linkedlist_rewind_current(struct linkedlist *lst);
 void linkedlist_print(struct linkedlist *lst);
+void linkedlist_print_until_current(struct linkedlist *lst);
+void linkedlist_free(struct linkedlist **lst);
 
 #endif /*LINKEDLIST_H_*/
