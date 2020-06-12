@@ -1,4 +1,4 @@
-//linkedlist.h
+// linkedlist.h
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,17 +16,16 @@ struct node{
 };
 
 struct linkedlist{
-    struct node *head; // newly added element becomes the head
-    struct node *tail; // first element becomes the tail
+    struct node *head;
+    struct node *tail;
 };
 
 void init_node(struct node **head, int val, int x, int y, struct node *next, struct node *prev);
-void remove_node(struct node **head);
 
-void init_linkedlist(struct linkedlist **lst, int val, int x, int y);
-void insert_head_linkedlist(struct linkedlist *lst, int val, int x, int y);
-void remove_head_linkedlist(struct linkedlist *lst);
-void delete_linkedlist(struct linkedlist **lst);
-void print_linkedlist(struct linkedlist *lst);
+void linkedlist_init(struct linkedlist **lst, int val, int x, int y);
+void linkedlist_insert(struct linkedlist *lst, int val, int x, int y);
+void linkedlist_remove(struct linkedlist *lst);
+void linkedlist_free(struct linkedlist **lst);
+void linkedlist_print(struct linkedlist *lst);
+
 #endif /*LINKEDLIST_H_*/
-

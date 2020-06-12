@@ -1,4 +1,4 @@
-//board.h
+// board.h
 #include <stdlib.h>
 #include <stdbool.h>
 #include "utils/linkedlist.h"
@@ -16,21 +16,20 @@ struct cell{
 struct cell* init_cell();
 
 /* modify board methods */
-void init_board(int board_size);
-void delete_board();
-void print_board();
+void board_init(int board_size);
+void board_free();
+void board_print();
 
 /* move methods */
-bool valid_move(int x, int y);
-void set_move(int val, int x, int y);
-void edit_move(int val, int x, int y);
-void remove_move(int x, int y);
+bool move_valid(int x, int y);
+void move_set(int val, int x, int y);
+void move_edit(int val, int x, int y);
+void move_remove(int x, int y);
+void move_undo();
+void move_redo();
 
 /* modify history methods*/
-void insert_history(int val, int x, int y);
-void remove_history();
-void undo_move();
-void redo_move();
+void history_insert(int val, int x, int y);
+void history_remove();
 
 #endif
-
