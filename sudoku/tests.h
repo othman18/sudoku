@@ -1,5 +1,5 @@
 // tests.h
-#include "board.h"
+#include "utils/parser.h"
 
 
 #ifndef TESTS_H_
@@ -10,5 +10,8 @@ void test1();
 void test2();
 void test3();
 void test4();
+void test5();
+void test6();
+void test7();
 
 #endif

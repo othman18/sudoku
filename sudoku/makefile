@@ -1,6 +1,6 @@
 CC = g++-9#gcc
 
-OBJS = main.o linkedlist.o stack.o board.o tests.o
+OBJS = main.o linkedlist.o board.o parser.o tests.o #stack.o 
 EXEC = exe
 
 COMP_FLAGS = -ansi -O3 -Wall -pedantic-errors
@@ -15,17 +15,19 @@ $(EXEC): $(OBJS)
 linkedlist.o: utils/linkedlist.h
 	$(CC) $(COMP_FLAGS) -c utils/linkedlist.c
 
-stack.o: utils/stack.h 
-	$(CC) $(COMP_FLAGS) -c utils/stack.c
+#stack.o: utils/stack.h 
+#	$(CC) $(COMP_FLAGS) -c utils/stack.c
 
 board.o: board.h
 	$(CC) $(COMP_FLAGS) -c $*.c
 
-main.o: board.h utils/stack.h tests.h
+main.o: tests.h
 	$(CC) $(COMP_FLAGS) -c $*.c
 
-tests.o: board.h utils/stack.h
-	$(CC) $(COMP_FLAGS) -c $*.c
+parser.o: utils/parser.h
+	$(CC) $(COMP_FLAGS) -c utils/parser.c
 
+tests.o: tests.h
+	$(CC) $(COMP_FLAGS) -c $*.c
 clean:
 	rm -f *.o $(EXEC)

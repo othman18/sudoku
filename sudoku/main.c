@@ -1,10 +1,12 @@
-#include "board.h"
 #include "tests.h"
 
-void run_tests();
 
 int main(){
-
+	setbuf(stdout, NULL); // clear stdout
+	
+//	get_command();
+	
+	
     run_tests();
     return EXIT_SUCCESS;
 }

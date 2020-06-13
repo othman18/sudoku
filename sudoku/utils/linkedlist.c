@@ -11,7 +11,7 @@ void node_init(struct node **new_node, int val, int x, int y, struct node *next,
 		*new_node = (struct node*)malloc(sizeof(struct node));
 	}
     else{
-        printf(RED "error, node already init\n" DEFAULT);
+        printf(RED "Error, node already init\n" DEFAULT);
         return;
     }
 	(*new_node)->val = val;
@@ -25,7 +25,7 @@ void node_init(struct node **new_node, int val, int x, int y, struct node *next,
 /* free node from memory */
 void node_free(struct node *delete_node){
 	if(delete_node == NULL){
-        printf(RED "error, node not init\n" DEFAULT);
+        printf(RED "Error, node not init\n" DEFAULT);
 		return;
 	}
 	if(delete_node->next != NULL){
@@ -79,32 +79,32 @@ void linkedlist_insert(struct linkedlist *lst, int val, int x, int y){
 /* remove tail element and update it */
 void linkedlist_remove_last(struct linkedlist *lst){
 	if(lst == NULL || lst->tail == NULL){
-		printf(RED "error, empty list!\n" DEFAULT);
+		printf(RED "Error, empty list!\n" DEFAULT);
 		return;
 	}
-	struct node *current_node = lst->tail;	
+	struct node *current_node = lst->tail;
 	lst->tail = lst->tail->prev; // make the prev node as tail
+	// if current_move was the tail and the tail is about to get deleted
+	// set current_move as the prev of tail
+	if(lst->current_move == current_node){
+		lst->current_move = lst->tail;
+	}
 	node_free(current_node);
+	current_node = NULL;
 }
 
 
 /* remove all the nodes after the current pointer */
 void linkedlist_remove_until_current(struct linkedlist *lst){
 	if(lst == NULL || lst->current_move == NULL){
-		printf(RED "error, list or current_move not init!\n" DEFAULT);
+		printf(RED "Error, list or current_move not init!\n" DEFAULT);
 		return;
 	}
 	
-	if(lst->current_move == lst->tail){
-		return;
-	}
-	
-	// delete all nodes except the tail, in order to save it and break out of 
-	// the loop, then set the current_move as the new tail 
-	while(lst->current_move->next != lst->tail){
+	// delete all nodes except then set the current_move as the new tail 
+	while(lst->current_move->next != NULL){
 		node_free(lst->current_move->next);
 	}
-	node_free(lst->current_move->next);
 	lst->tail = lst->current_move;
 }
 
@@ -112,7 +112,7 @@ void linkedlist_remove_until_current(struct linkedlist *lst){
 /* move the current pointer to its prev*/
 bool linkedlist_forward_current(struct linkedlist *lst){
 	if(lst == NULL || lst->current_move == NULL){
-		printf(RED "error, list or current_move not init!\n" DEFAULT);
+		printf(RED "Error, list or current_move not init!\n" DEFAULT);
 		return false;
 	}
 	if(lst->current_move == lst->tail){
@@ -126,7 +126,7 @@ bool linkedlist_forward_current(struct linkedlist *lst){
 /* move the current pointer to its next*/
 bool linkedlist_rewind_current(struct linkedlist *lst){
 	if(lst == NULL || lst->current_move == NULL){
-		printf(RED "error, list or current_move not init!\n" DEFAULT);
+		printf(RED "Error, list or current_move not init!\n" DEFAULT);
 		return false;
 	}
 	if(lst->current_move == lst->head){
@@ -172,7 +172,7 @@ void linkedlist_free(struct linkedlist **lst){
 		linkedlist_remove_last(*lst);
 	}
 	free(*lst);
-	lst = NULL;
+	*lst = NULL;
 }
 
 

@@ -18,9 +18,10 @@ struct cell* init_cell();
 void board_init(int board_size);
 void board_free();
 void board_print();
+void board_reset();
 
 /* move methods */
-bool move_is_valid(int x, int y);
+bool move_is_valid(int val, int x, int y);
 void move_set(int val, int x, int y);
 void move_edit(int val, int x, int y);
 void move_remove(int x, int y);
@@ -30,6 +31,5 @@ void move_redo();
 /* modify history methods*/
 void history_insert(int val, int x, int y);
 void history_print();
-//void history_remove();
 
 #endif
