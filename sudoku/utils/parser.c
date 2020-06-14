@@ -10,6 +10,8 @@ const char glob_delemeter[8] = " \t\r\n\v\f";
 
 void start_game(){
     setbuf(stdout, NULL); // clear stdout
+	if(system("clear"));
+
     printf("Enter board dimensions N X N: ");
     char *command = (char*)malloc(M);
     if(fgets(command, M, stdin) != NULL){}
@@ -49,7 +51,6 @@ void get_command(){
 	
     if(fgets(command, M, stdin) != NULL){}
     bool print_board = true;
-    
     if(is_valid_exit(command)){ 
 		free(command); 
 		return; 
@@ -60,6 +61,7 @@ void get_command(){
     else if(is_valid_remove(command)){}
 	else if(is_valid_undo(command)){}
 	else if(is_valid_redo(command)){}
+	else if(is_valid_clear(command)){}
 	else if(is_valid_help(command)){}
 	else{
 		printf("Error, no such command exists\n");
@@ -85,7 +87,7 @@ bool is_valid_reset(char* command){
     char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
     if(token_end != glob_null_char){
         printf("Error, entered too many parameters.\n");
-        return false;
+        return true;
     }
     board_reset();
 	return true;
@@ -260,6 +262,23 @@ bool is_valid_exit(char* command){
 }
 
 
+bool is_valid_clear(char* command){
+    char command_tmp[M];
+    strcpy(command_tmp, command);
+    char *token_command = strtok(command_tmp, glob_delemeter); // tokinize command
+    if (strcmp(token_command, CLEAR)) {
+        return false;
+    }
+    char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
+    if(token_end != glob_null_char){
+        printf("Error, entered too many parameters.\n");
+        return true;
+    }
+	if(system("clear"));
+    return true;
+}
+
+
 bool is_valid_help(char* command){
     char command_tmp[M];
     strcpy(command_tmp, command);
@@ -277,8 +296,8 @@ bool is_valid_help(char* command){
     	STARS "remove X:int Y:int => [X][Y] = EMPTY\n"
     	STARS "undo => undo last move\n"
     	STARS "redo => redo last move\n"
-    	STARS "exit => exit program\n");
-    
+    	STARS "clear => clear terminal\n"
+    	STARS "exit => end program\n");
     return true;
 }
 
@@ -294,7 +313,6 @@ bool is_number(char* token){
     }
 	return true;
 }
-
 
 
 
