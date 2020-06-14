@@ -16,16 +16,19 @@ void start_game(){
     char *token = strtok(command, glob_delemeter); // tokinize command
     if(!is_number(token)){
         printf("Error, dimension must be an int\n");
+        free(command);
         start_game();
     }
     else{
         int dim = atoi(token);
         if(dim < 2){
             printf("Error, dimension can't be lower than 2\n");
+        	free(command);
             start_game();
         }
         if(dim > 9){
             printf("Error, dimension can't exceed 9 (for now...)\n");
+	        free(command);
             start_game();
         }
         else{
@@ -33,6 +36,8 @@ void start_game(){
     //      board_generate(dim);
             board_print();
             get_command();
+	        free(command);
+            board_free();
         }
     }
 }
@@ -45,7 +50,10 @@ void get_command(){
     if(fgets(command, M, stdin) != NULL){}
     bool print_board = true;
     
-    if(is_valid_exit(command)){ return; }
+    if(is_valid_exit(command)){ 
+		free(command); 
+		return; 
+    }
     else if(is_valid_set(command)){}
     else if(is_valid_reset(command)){}
 	else if(is_valid_edit(command)){}
@@ -247,7 +255,6 @@ bool is_valid_exit(char* command){
         printf("Error, entered too many parameters.\n");
         return true;
     }
-    board_free();
     return true;
 }
 
