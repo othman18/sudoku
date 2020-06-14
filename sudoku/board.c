@@ -114,11 +114,11 @@ bool move_is_valid(int val, int x, int y){
 		valid_b = false;
 	}
 	else if(x < 0 ||x >= glob_board_size){
-		printf(RED "Invalid move, x: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, x, glob_board_size);
+		printf(RED "Invalid move, x: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, x, glob_board_size - 1);
 		valid_b = false;
 	}
 	else if(y < 0 || y >= glob_board_size){
-		printf(RED "Invalid move, y: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, y, glob_board_size);
+		printf(RED "Invalid move, y: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, y, glob_board_size - 1);
 		valid_b = false;
 	}
 	else if(val < 1 || val > glob_board_size){

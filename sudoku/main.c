@@ -2,12 +2,8 @@
 
 
 int main(){
-	setbuf(stdout, NULL); // clear stdout
-	
-//	get_command();
-	
-	
-    run_tests();
+	start_game();
+    //run_tests();
     return EXIT_SUCCESS;
 }
 

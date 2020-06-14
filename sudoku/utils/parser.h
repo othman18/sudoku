@@ -1,13 +1,23 @@
 // parser.h
 #include "../board.h"
-
+#include <string.h> //using strcmp
+#include <ctype.h> //using isdigit
 
 #ifndef PARSER_H_
 #define PARSER_H_
 
+#define RESET "reset"
+#define SET "set"
+#define EDIT "edit"
+#define REMOVE "remove"
+#define UNDO "undo"
+#define REDO "redo"
+#define EXIT "exit"
+
+
+void start_game();
 void get_command();
 bool is_number(char* token);
-bool is_valid_print(char* command);
 bool is_valid_reset(char* command);
 bool is_valid_set(char* command);
 bool is_valid_edit(char* command);

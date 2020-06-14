@@ -4,7 +4,7 @@
 
 void run_tests(){
     // tests for valgrind
-//*
+/*
     test1();
     test2();
 	test3();
