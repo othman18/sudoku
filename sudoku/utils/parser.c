@@ -13,14 +13,14 @@ void start_game(){
     printf("Enter board dimensions N X N: ");
     char *command = (char*)malloc(M);
     if(fgets(command, M, stdin) != NULL){}
-    char *token = strtok(command, glob_delemeter); // tokinize command
-    if(!is_number(token)){
+    char *token_dim = strtok(command, glob_delemeter); // tokinize command
+    if(!is_number(token_dim)){
         printf("Error, dimension must be an int\n");
         free(command);
         start_game();
     }
     else{
-        int dim = atoi(token);
+        int dim = atoi(token_dim);
         if(dim < 2){
             printf("Error, dimension can't be lower than 2\n");
         	free(command);
