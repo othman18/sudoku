@@ -60,6 +60,7 @@ void get_command(){
     else if(is_valid_remove(command)){}
 	else if(is_valid_undo(command)){}
 	else if(is_valid_redo(command)){}
+	else if(is_valid_help(command)){}
 	else{
 		printf("Error, no such command exists\n");
         print_board = false;
@@ -105,8 +106,8 @@ bool is_valid_set(char* command){
     char *token_end = strtok(NULL, glob_delemeter);
 
     if(token_val == glob_null_char ||
-       token_x == glob_null_char ||
-       token_y == glob_null_char){
+       	token_x == glob_null_char ||
+       	token_y == glob_null_char){
         printf("Error, entered too few parameters.\n");
         return true;
     }
@@ -145,8 +146,8 @@ bool is_valid_edit(char* command){
     char *token_end = strtok(NULL, glob_delemeter);
 
     if(token_val == glob_null_char ||
-       token_x == glob_null_char ||
-       token_y == glob_null_char){
+		token_x == glob_null_char ||
+       	token_y == glob_null_char){
         printf("Error, entered too few parameters.\n");
         return true;
     }
@@ -258,6 +259,30 @@ bool is_valid_exit(char* command){
     return true;
 }
 
+
+bool is_valid_help(char* command){
+    char command_tmp[M];
+    strcpy(command_tmp, command);
+    char *token_command = strtok(command_tmp, glob_delemeter); // tokinize command
+    if (strcmp(token_command, HELP)) {
+        return false;
+    }
+    char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
+    if(token_end != glob_null_char){
+        printf("Error, entered too many parameters.\n");
+        return true;
+    }
+    
+    printf("Available commands:\n" STARS "set VAL:int X:int Y:int => [X][Y] = Val\n"
+    	STARS "remove X:int Y:int => [X][Y] = EMPTY\n"
+    	STARS "undo => undo last move\n"
+    	STARS "redo => redo last move\n"
+    	STARS "exit => exit program\n");
+    
+    return true;
+}
+
+
 bool is_number(char* token){
     if(token == NULL){
         return false;
@@ -269,4 +294,7 @@ bool is_number(char* token){
     }
 	return true;
 }
+
+
+
 
