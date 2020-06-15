@@ -1,9 +1,13 @@
 // board.h
-#include "utils/linkedlist.h"
+#include "linkedlist.h"
 
 
 #ifndef BOARD_H_
 #define BOARD_H_
+
+#define MODE_RW 0
+#define MODE_R 1
+#define MODE_F 2
 
 struct cell{
 	int mode; // 0 = read/write, 1 = read, 2 = fixed 

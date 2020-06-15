@@ -1,5 +1,5 @@
 // parser.h
-#include "../board.h"
+#include "board.h"
 #include <string.h> //using strcmp
 #include <ctype.h> //using isdigit
 

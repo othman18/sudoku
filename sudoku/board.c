@@ -13,7 +13,7 @@ linkedlist *glob_move_history = NULL;
 cell* init_cell(){
 	struct cell *new_cell = (struct cell*) malloc(sizeof(struct cell));
 	new_cell->val = 0;
-	new_cell->mode = 0;
+	new_cell->mode = MODE_RW;
 	return new_cell;
 }
 
@@ -137,15 +137,15 @@ void move_set(int val, int x, int y){
 	}
 	
 	switch(glob_board[x][y]->mode){
-		case 0:
+		case MODE_RW:
 			glob_board[x][y]->val = val;
-			glob_board[x][y]->mode = 1;
+			glob_board[x][y]->mode = MODE_R;
 			history_insert(val, x, y);
 			break;
-		case 1:
+		case MODE_R:
 			printf(RED "Invalid move, cell[%d][%d] was already set, use edit to modify cell\n" DEFAULT, x, y);
 			break;
-		case 2:
+		case MODE_F:
 			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT, x, y);
 			break;
 		default:
@@ -160,14 +160,14 @@ void move_edit(int val, int x, int y){
 		return;
 	}
 	switch(glob_board[x][y]->mode){
-		case 0:
+		case MODE_RW:
 			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x, y);
 			break;
-		case 1:
-			glob_board[x][y]->mode = 0;
+		case MODE_R:
+			glob_board[x][y]->mode = MODE_RW;
 			move_set(val, x, y);
 			break;
-		case 2:
+		case MODE_F:
 			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT, x, y);
 			break;
 		default:
@@ -182,14 +182,15 @@ void move_remove(int x, int y){
 		return;
 	}
 	switch(glob_board[x][y]->mode){
-		case 0:
+		case MODE_RW:
 			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x, y);
 			break;
-		case 1:
-			glob_board[x][y]->mode = 0;
+		case MODE_R:
+			glob_board[x][y]->mode = MODE_RW;
 			glob_board[x][y]->val = 0;
+			//history_insert(val, x, y);
 			break;
-		case 2:
+		case MODE_F:
 			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT, x, y);
 			break;
 		default:
@@ -227,17 +228,18 @@ void move_redo(){
 	}
 	struct node *prev_move = glob_move_history->current_move;
 	glob_board[prev_move->x][prev_move->y]->val = prev_move->val;
-	glob_board[prev_move->x][prev_move->y]->mode = 1;
+	glob_board[prev_move->x][prev_move->y]->mode = MODE_R;
 }
 
 
 ///////////////////////////////////////HISTORY METHODS//////////////////////////
 
 
+/* add move to history, first node in the history is a dummy node which will
+   never be accesed */
 void history_insert(int val, int x, int y){
 	if(glob_move_history == NULL){
-		linkedlist_init(&glob_move_history, val, x, y);
-		return;
+		linkedlist_init(&glob_move_history, -1, -1, -1);  // dummy node
 	}
 	linkedlist_insert(glob_move_history, val, x, y);
 }
