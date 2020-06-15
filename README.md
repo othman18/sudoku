@@ -23,5 +23,5 @@
 * clear => clears terminal
 * reset => resets board
 * exit => ends program
-* help => displays all possible moves
+* help => displays all user commands
 
