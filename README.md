@@ -1,16 +1,17 @@
-Sudoku Game & Solver
+# Sudoku Game & Solver
 
-####requirements
+#### requirements
 
 * g++-9 compiler (or change the makefile to any other version)
 
 
-####run game
+#### run game:
 
-* Simply run ./sudoku
+* make
+* ./sudoku
 
 
-####game commands
+#### game commands
 
 * set VAL:int X:int Y:int => sets the board(x, y) = val
 * remove X:int Y:int => sets the board(x, y) = emtpy
