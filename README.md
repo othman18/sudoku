@@ -5,7 +5,7 @@
 * g++-9 compiler (or change the makefile to any other version)
 
 
-#### run game:
+#### run game
 
 ```bash
 * make

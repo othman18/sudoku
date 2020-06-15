@@ -1,6 +1,6 @@
 CC = g++-9
 
-OBJS = main.o linkedlist.o board.o parser.o tests.o #stack.o 
+OBJS = main.o linkedlist.o board.o parser.o tests.o
 EXEC = sudoku
 
 COMP_FLAGS = -ansi -O3 -Wall -pedantic-errors
@@ -14,9 +14,6 @@ $(EXEC): $(OBJS)
 
 linkedlist.o: linkedlist.h
 	$(CC) $(COMP_FLAGS) -c $*.c
-
-#stack.o: utils/stack.h 
-#	$(CC) $(COMP_FLAGS) -c utils/stack.c
 
 board.o: board.h
 	$(CC) $(COMP_FLAGS) -c $*.c
