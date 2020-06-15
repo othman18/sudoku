@@ -7,8 +7,10 @@
 
 #### run game:
 
+``bash
 * make
-* ./sudoku
+* ./sudoku`
+```
 
 
 #### game commands
