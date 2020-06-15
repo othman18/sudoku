@@ -1,4 +1,5 @@
 *.o
+sudoku
 exe
 *~
 *.DS_Store
