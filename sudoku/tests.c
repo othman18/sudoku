@@ -11,11 +11,11 @@ void run_tests(){
  	test4();
  	test5();
     test6();
-//*/
     test7();
+//*/
 }
 
-
+#if 0
 void test1(){
     printf("\ntest1\n");
     struct linkedlist *lst = NULL;
@@ -126,7 +126,7 @@ void test7(){
 
 
 
-
+#endif
 
 
 

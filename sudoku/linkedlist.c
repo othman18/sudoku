@@ -5,8 +5,9 @@
 ///////////////////////////////////////NODE METHODS///////////////////////
 
 
-void node_init(struct node **new_node, int val, int x, int y, struct node *next,
-	struct node *prev){
+void node_init(struct node **new_node, int val, int x, int y, int val_prev,
+	int move_type, struct node *next, struct node *prev){
+	
 	if(*new_node == NULL){
 		*new_node = (struct node*)malloc(sizeof(struct node));
 	}
@@ -15,8 +16,10 @@ void node_init(struct node **new_node, int val, int x, int y, struct node *next,
         return;
     }
 	(*new_node)->val = val;
+	(*new_node)->val_prev = val_prev;
 	(*new_node)->x = x;
 	(*new_node)->y = y;
+	(*new_node)->move_type = move_type;
 	(*new_node)->next = next;
 	(*new_node)->prev = prev;
 }
@@ -45,13 +48,15 @@ void node_free(struct node *delete_node){
 /* init a linkedlist with a given value
    set head, tail and current_move as the same first node
 */
-void linkedlist_init(struct linkedlist **lst, int val, int x, int y){
+void linkedlist_init(struct linkedlist **lst, int val, int x, int y, int val_prev,
+	int move_type){
+
 	if(*lst != NULL){
         linkedlist_free(lst);
     }
     *lst = (struct linkedlist*)malloc(sizeof(struct linkedlist));
 	(*lst)->head = NULL;
-	node_init(&((*lst)->head), val, x, y, NULL, NULL);
+	node_init(&((*lst)->head), val, x, y, val_prev, move_type, NULL, NULL);
     (*lst)->tail = (*lst)->head;
     (*lst)->current_move = (*lst)->tail;
 }
@@ -60,16 +65,17 @@ void linkedlist_init(struct linkedlist **lst, int val, int x, int y){
 /* create a new node which will act as the new tail
    remove all the nodes after current_move and set it to tail
  */
-void linkedlist_insert(struct linkedlist *lst, int val, int x, int y){
+void linkedlist_insert(struct linkedlist *lst, int val, int x, int y, int val_prev, 
+	int move_type){
+
 	if(lst == NULL || lst->head == NULL){
 		return;
 	}
     linkedlist_remove_until_current(lst); // set current_move as tail
 	struct node *new_node = NULL;
-	node_init(&new_node, val, x, y,
+	node_init(&new_node, val, x, y, val_prev, move_type,
 		NULL, // new node won't have a next;
 		lst->tail); // set tail as prev
-	
 	lst->tail->next = new_node; // set new tail
 	lst->tail = new_node;
     lst->current_move = lst->tail;
@@ -143,7 +149,22 @@ void linkedlist_print(struct linkedlist *lst){
     }
     struct node *current_node = lst->head;
     while(current_node != NULL){
-        printf("%d ", current_node->val);
+        switch(current_node->move_type){
+        	case(MOVE_DUM):  // dummy node
+        		printf("%d:DUM, ", current_node->val);
+        		break;
+        	case(MOVE_INS):
+        		printf("%d:INS, ", current_node->val);
+        		break;
+        	case(MOVE_REM):
+        		printf("%d:REM, ", current_node->val_prev);
+        		break;
+        	case(MOVE_MOD):
+        		printf("%d:MOD, ", current_node->val_prev);
+        		break;
+        	default:
+        		printf("TYPE ERROR");
+        }
         current_node = current_node->next;
     }
     printf("\n");
@@ -155,8 +176,23 @@ void linkedlist_print_until_current(struct linkedlist *lst){
         return;
     }
     struct node *current_node = lst->head;
-    while(current_node!= lst->current_move->next){
-        printf("%d ", current_node->val);
+    while(current_node != lst->current_move->next){
+        switch(current_node->move_type){
+         	case(MOVE_DUM):  // dummy node
+        		printf("%d:DUM, ", current_node->val);
+        		break;
+        	case(MOVE_INS):
+        		printf("%d:INS, ", current_node->val);
+        		break;
+        	case(MOVE_REM):
+        		printf("%d:REM, ", current_node->val_prev);
+        		break;
+        	case(MOVE_MOD):
+        		printf("%d:MOD, ", current_node->val_prev);
+        		break;
+	       	default:
+        		printf("TYPE ERROR");
+        }
         current_node = current_node->next;
     }
     printf("\n");

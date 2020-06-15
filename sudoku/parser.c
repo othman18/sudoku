@@ -17,19 +17,19 @@ void start_game(){
     if(fgets(command, M, stdin) != NULL){}
     char *token_dim = strtok(command, glob_delemeter); // tokinize command
     if(!is_number(token_dim)){
-        printf("Error, dimension must be an int\n");
+        printf(RED "Error, dimension must be an int\n" DEFAULT);
         free(command);
         start_game();
     }
     else{
         int dim = atoi(token_dim);
         if(dim < 2){
-            printf("Error, dimension can't be lower than 2\n");
+            printf(RED "Error, dimension can't be lower than 2\n" DEFAULT);
         	free(command);
             start_game();
         }
         if(dim > 9){
-            printf("Error, dimension can't exceed 9 (for now...)\n");
+            printf(RED "Error, dimension can't exceed 9 (for now...)\n" DEFAULT);
 	        free(command);
             start_game();
         }
@@ -64,7 +64,7 @@ void get_command(){
 	else if(is_valid_clear(command)){}
 	else if(is_valid_help(command)){}
 	else{
-		printf("Error, no such command exists\n");
+		printf(RED "Error, no such command exists\n" DEFAULT);
         print_board = false;
 	}
     
@@ -86,7 +86,7 @@ bool is_valid_reset(char* command){
     }
     char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     board_reset();
@@ -110,23 +110,23 @@ bool is_valid_set(char* command){
     if(token_val == glob_null_char ||
        	token_x == glob_null_char ||
        	token_y == glob_null_char){
-        printf("Error, entered too few parameters.\n");
+        printf(RED "Error, entered too few parameters.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_val)){
-        printf("Error, val must be an int.\n");
+        printf(RED "Error, val must be an int.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_x)){
-        printf("Error, X must be an int.\n");
+        printf(RED "Error, X must be an int.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_y)){
-        printf("Error, Y must be an int.\n");
+        printf(RED "Error, Y must be an int.\n" DEFAULT);
         return true;
     }
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     move_set(atoi(token_val), atoi(token_x), atoi(token_y));
@@ -150,23 +150,23 @@ bool is_valid_edit(char* command){
     if(token_val == glob_null_char ||
 		token_x == glob_null_char ||
        	token_y == glob_null_char){
-        printf("Error, entered too few parameters.\n");
+        printf(RED "Error, entered too few parameters.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_val)){
-        printf("Error, val must be an int.\n");
+        printf(RED "Error, val must be an int.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_x)){
-        printf("Error, X must be an int.\n");
+        printf(RED "Error, X must be an int.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_y)){
-        printf("Error, Y must be an int.\n");
+        printf(RED "Error, Y must be an int.\n" DEFAULT);
         return true;
     }
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     move_edit(atoi(token_val), atoi(token_x), atoi(token_y));
@@ -188,19 +188,19 @@ bool is_valid_remove(char* command){
 
     if(token_x == glob_null_char ||
        token_y == glob_null_char){
-        printf("Error, entered too few parameters.\n");
+        printf(RED "Error, entered too few parameters.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_x)){
-        printf("Error, X must be an int.\n");
+        printf(RED "Error, X must be an int.\n" DEFAULT);
         return true;
     }
     if(!is_number(token_y)){
-        printf("Error, Y must be an int.\n");
+        printf(RED "Error, Y must be an int.\n" DEFAULT);
         return true;
     }
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     move_remove(atoi(token_x), atoi(token_y));
@@ -219,7 +219,7 @@ bool is_valid_undo(char* command){
     char *token_end = strtok(NULL, glob_delemeter);
 
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     move_undo();
@@ -238,7 +238,7 @@ bool is_valid_redo(char* command){
     char *token_end = strtok(NULL, glob_delemeter);
 
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     move_redo();
@@ -255,7 +255,7 @@ bool is_valid_exit(char* command){
     }
     char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     return true;
@@ -271,7 +271,7 @@ bool is_valid_clear(char* command){
     }
     char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
 	if(system("clear"));
@@ -288,7 +288,7 @@ bool is_valid_help(char* command){
     }
     char *token_end = strtok(NULL, glob_delemeter); // using NULL will continue to tokinize command
     if(token_end != glob_null_char){
-        printf("Error, entered too many parameters.\n");
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
         return true;
     }
     
@@ -297,6 +297,7 @@ bool is_valid_help(char* command){
     	STARS "undo => undo last move\n"
     	STARS "redo => redo last move\n"
     	STARS "clear => clear terminal\n"
+    	STARS "reset => reset board\n"
     	STARS "exit => end program\n");
     return true;
 }
