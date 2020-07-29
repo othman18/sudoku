@@ -1,6 +1,5 @@
-// tests.h
+/* tests.h */
 #include "parser.h"
-
 
 #ifndef TESTS_H_
 #define TESTS_H_

@@ -3,6 +3,5 @@ TODO
 		generate board
 		check if solved board
 		get hint
-		
-BUGS:
-	-
+
+	bug when giving empty string to enter command

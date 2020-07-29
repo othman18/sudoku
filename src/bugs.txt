@@ -3,3 +3,6 @@ TODO
 		generate board
 		check if solved board
 		get hint
+
+BUGS:
+	-

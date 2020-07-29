@@ -1,7 +1,7 @@
-// parser.h
+/* parser.h */
 #include "board.h"
-#include <string.h> //using strcmp
-#include <ctype.h> //using isdigit
+#include <string.h> /* using strcmp */
+#include <ctype.h> /* using isdigit */
 
 #ifndef PARSER_H_
 #define PARSER_H_
@@ -17,11 +17,13 @@
 #define HELP "help"
 #define STARS "\t>>  "
 
-
-
 void start_game();
 void get_command();
-/* user methods */
+void get_command_list();
+
+/*
+ * user methods
+ */
 bool is_valid_reset(char* command);
 bool is_valid_set(char* command);
 bool is_valid_edit(char* command);
@@ -32,6 +34,8 @@ bool is_valid_exit(char* command);
 bool is_valid_clear(char* command);
 bool is_valid_help(char* command);
 
-/* inner methods*/
+/*
+ * internal methods
+ */
 bool is_number(char* token);
 #endif

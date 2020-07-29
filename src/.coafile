@@ -1,0 +1,5 @@
+[cli]
+bears = SpaceConsistencyBear
+files = *
+use_spaces = False
+default_actions = *: ApplyPatchAction

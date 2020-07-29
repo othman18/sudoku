@@ -1,9 +1,9 @@
-CC = g++-9
+CC = gcc
 
 OBJS = main.o linkedlist.o board.o parser.o tests.o
 EXEC = sudoku
 
-COMP_FLAGS = -ansi -O3 -Wall -pedantic-errors
+COMP_FLAGS = -O3 -Wall -pedantic-errors -Werror
 #GUROBI_COMP = -I/usr/local/lib/gurobi563/include
 #GUROBI_LIB = -L/usr/local/lib/gurobi563/lib -lgurobi56
 
