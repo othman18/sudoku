@@ -38,7 +38,10 @@ void start_game(){
 	}
 }
 
-
+/*
+ * get the command entered by the user and check if it's a valid command
+ * print error otherwise and wait for the next command
+ */
 void get_command(){
     get_command_list();
 	printf("Enter command: ");
@@ -74,7 +77,9 @@ void get_command_list(){
     printf("To list game commands, type \"help\"\n");
 }
 
-
+/*
+ * check if command == "reset" and reset the board
+ */
 bool is_valid_reset(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -95,6 +100,10 @@ bool is_valid_reset(char* command){
 }
 
 
+/*
+ * check if command == "set val x y" board[x][y] = val, unless
+ * val/x/y is out of bounds
+ */
 bool is_valid_set(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -136,6 +145,11 @@ bool is_valid_set(char* command){
 }
 
 
+/*
+ * check if command == "edit val x y" board[x][y] = val, unless
+ * board[x][y] is empty
+ * val/x/y is out of bounds
+ */
 bool is_valid_edit(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -177,6 +191,11 @@ bool is_valid_edit(char* command){
 }
 
 
+/*
+ * check if command == "remove x y" board[x][y] = empty, unless
+ * board[x][y] is empty
+ * x/y is out of bounds
+ */
 bool is_valid_remove(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -212,6 +231,10 @@ bool is_valid_remove(char* command){
 }
 
 
+/*
+ * check if command == "undo" then reverse the last move, unless
+ * there are no more moves do undo
+ */
 bool is_valid_undo(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -232,6 +255,10 @@ bool is_valid_undo(char* command){
 }
 
 
+/*
+ * check if command == "redo" then redo the last move, unless
+ * there are no more moves do redo
+ */
 bool is_valid_redo(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -252,6 +279,9 @@ bool is_valid_redo(char* command){
 }
 
 
+/*
+ * check if command == "exit" then free memory and terminate
+ */
 bool is_valid_exit(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -270,6 +300,9 @@ bool is_valid_exit(char* command){
 }
 
 
+/*
+ * check if command == "clear" then clear the screen
+ */
 bool is_valid_clear(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -289,6 +322,9 @@ bool is_valid_clear(char* command){
 }
 
 
+/*
+ * check if command == "help" then display all the command options
+ */
 bool is_valid_help(char* command){
 	char command_tmp[M];
 	strcpy(command_tmp, command);
@@ -315,6 +351,9 @@ bool is_valid_help(char* command){
 }
 
 
+/*
+ * check if the string token is a number
+ */
 bool is_number(char* token){
 	if(token == NULL){
 		return false;
