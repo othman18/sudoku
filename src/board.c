@@ -26,7 +26,9 @@ struct cell* cell_init(){
 
 /*//////////////////////////////////////BOARD METHODS///////////////////////////*/
 
-
+/*
+ * init board struct with dimensions n and m
+ */
 void board_init(int size_m, int size_n){
 	if(size_m * size_n < 2){
 		printf(RED "Board size can't be lower than 2\n" DEFAULT);
@@ -50,7 +52,9 @@ void board_init(int size_m, int size_n){
 	}
 }
 
-
+/*
+ * free board from memory
+ */
 void board_free(){
 	if(glob_board == NULL){
 		return;
@@ -68,6 +72,9 @@ void board_free(){
 }
 
 
+/*
+ * print board to console
+ */
 void board_print(){
 	if(glob_board == NULL){
 		printf(RED "Board not init\n" DEFAULT);
@@ -103,6 +110,10 @@ void board_print(){
 	printf("\n");
 }
 
+
+/*
+ * print board to console
+ */
 void board_print_dashes(){
 	for(int i = 0; i < glob_board_size * 4 + glob_board_size_n + 1; i++){
 		printf("-");
@@ -110,6 +121,9 @@ void board_print_dashes(){
 }
 
 
+/*
+ * reset board
+ */
 void board_reset(){
 	if(glob_board == NULL){
 		printf(RED "Board not init\n" DEFAULT);
@@ -227,7 +241,9 @@ void move_remove(int x, int y){
 	}
 }
 
-
+/*
+ * remove prev move and clear the board where it was set.
+ */
 void move_undo(){
 	if(glob_board == NULL){
 		printf(RED "Board not init\n" DEFAULT);
@@ -260,7 +276,8 @@ void move_undo(){
 }
 
 
-/* restore prev move and set it. We don't need to check the move,
+/*
+ * restore prev move and set it. We don't need to check the move,
  * since this is a previously inserted move, which was already validated
  */
 void move_redo(){
@@ -308,7 +325,9 @@ void history_insert(int val, int x, int y, int val_prev, int move_type){
 	linkedlist_insert(glob_move_history, val, x, y, val_prev, move_type);
 }
 
-
+/*
+ * internal method used for debugging
+ */
 void history_print(){
 	printf("	 Move history: ");
 	linkedlist_print_until_current(glob_move_history);

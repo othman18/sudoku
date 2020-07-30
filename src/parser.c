@@ -20,7 +20,10 @@ void start_game(){
     
 }
 
-
+/*
+ * get the user's input and set it the dimension m and n
+ * if the user only gives one dimension then assume m = n
+ */
 void get_mn_dim(int *size_m, int *size_n){
     printf("Enter board dimensions m X n: ");
     char *command = (char*)malloc(M);
@@ -68,7 +71,7 @@ void get_mn_dim(int *size_m, int *size_n){
  * print error otherwise and wait for the next command
  */
 void get_command(){
-    print_command_list_msg();
+    printf("To list game commands, type \"help\"\n");
 	printf("Enter command: ");
 	char *command = (char*)malloc(M);
 	if(fgets(command, M, stdin) != NULL){}
@@ -97,10 +100,6 @@ void get_command(){
 	get_command();
 }
 
-
-void print_command_list_msg(){
-    printf("To list game commands, type \"help\"\n");
-}
 
 /*
  * check if command == "reset" and reset the board

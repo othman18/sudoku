@@ -17,7 +17,7 @@
 struct node{
 	int val; /* move value */
 	int val_prev; /* prevous move */
-	int x,y; /* move coordinats */
+	int x, y; /* move coordinats */
 	int move_type; /* 0 = insert, 1 = remove, 2 = modify, -1 = dummy */
 	struct node *next, *prev;
 };

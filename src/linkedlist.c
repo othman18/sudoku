@@ -4,7 +4,10 @@
 
 /*//////////////////////////////////////NODE METHODS//////////////////////*/
 
-
+/*
+ * init the struct node with its values of val, x, y, val_prev, move_type
+ * next node and prev node
+ */
 void node_init(struct node **new_node, int val, int x, int y, int val_prev,
 	int move_type, struct node *next, struct node *prev){
 
@@ -157,6 +160,9 @@ bool linkedlist_rewind_current(struct linkedlist *lst){
 }
 
 
+/*
+* internal method used for debugging to check the history structure
+*/
 void linkedlist_print(struct linkedlist *lst){
 	if(lst == NULL){
 		return;
@@ -184,7 +190,9 @@ void linkedlist_print(struct linkedlist *lst){
 	printf("\n");
 }
 
-
+/*
+ * internal method used for debugging to check the history structure
+ */
 void linkedlist_print_until_current(struct linkedlist *lst){
 	if(lst == NULL){
 		return;

@@ -20,7 +20,7 @@
 void start_game();
 void get_mn_dim(int *size_m, int *size_n);
 void get_command();
-void print_command_list_msg();
+
 /*
  * user methods
  */
