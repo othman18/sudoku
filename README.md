@@ -2,7 +2,7 @@
 
 #### requirements
 
-* g++-9 compiler (or change the makefile to any other version)
+* gcc compiler (or change the makefile to any other version)
 
 
 #### run game
