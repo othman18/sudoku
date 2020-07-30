@@ -108,8 +108,6 @@ void board_print(){
 	}
 	board_print_dashes();
 	printf("\n");
-    
-    history_print();
 }
 
 

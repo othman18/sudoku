@@ -309,7 +309,7 @@ bool is_valid_help(char* token_command){
         system("clear");
         printf("Available commands:\n" STARS "set VAL:int X:int Y:int => [X][Y] = Val\n"
             STARS "remove X:int Y:int => [X][Y] = EMPTY\n"
-            STARS "edit VAL:int X:int Y:int => [X][Y] = Val\n"
+            STARS "edit NEW_VAL:int X:int Y:int => [X][Y] = NEW_VAL\n"
             STARS "undo => undo last move\n"
             STARS "redo => redo last move\n"
             STARS "clear => clear terminal\n"
