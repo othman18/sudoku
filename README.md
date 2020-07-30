@@ -2,13 +2,13 @@
 
 #### requirements
 
-* gcc compiler (or change the makefile to any other version)
+* gcc compiler
 
 
 #### run game
 
 ```bash
-* make && ./sudoku
+* sh run.sh
 ```
 
 
