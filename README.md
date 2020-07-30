@@ -8,8 +8,7 @@
 #### run game
 
 ```bash
-* make
-* ./sudoku
+* make && ./sudoku
 ```
 
 
@@ -17,6 +16,7 @@
 
 * set VAL:int X:int Y:int => sets the board(x, y) = val
 * remove X:int Y:int => sets the board(x, y) = emtpy
+* edit VAL:int X:int Y:int => modify the board(x, y) = new val
 * undo => reverses last move:
 	* if last move was set then it will get removed
 	* if last move was remove then it will get set again
