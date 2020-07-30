@@ -179,8 +179,8 @@ void linkedlist_print(struct linkedlist *lst){
 			case(MOVE_REM):
 				printf("%d:REM, ", current_node->val_prev);
 				break;
-			case(MOVE_MOD):
-				printf("%d:MOD, ", current_node->val_prev);
+			case(MOVE_EDI):
+				printf("%d:EDI, ", current_node->val_prev);
 				break;
 			default:
 				printf("TYPE ERROR");
@@ -209,8 +209,8 @@ void linkedlist_print_until_current(struct linkedlist *lst){
 			case(MOVE_REM):
 				printf("%d:REM, ", current_node->val_prev);
 				break;
-			case(MOVE_MOD):
-				printf("%d:MOD, ", current_node->val_prev);
+			case(MOVE_EDI):
+				printf("%d:EDI, ", current_node->val_prev);
 				break;
 			default:
 				printf("TYPE ERROR");

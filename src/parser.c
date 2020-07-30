@@ -76,18 +76,23 @@ void get_command(){
 	char *command = (char*)malloc(M);
 	if(fgets(command, M, stdin) != NULL){}
 	bool print_board = true;
-	if(is_valid_exit(command)){
+    
+    char *token_command = strtok(command, glob_delemeter); /* tokinize command */
+    
+	if(is_valid_exit(token_command)){
 		free(command);
 		return;
 	}
-	else if(is_valid_set(command)){}
-	else if(is_valid_reset(command)){}
-	else if(is_valid_edit(command)){}
-	else if(is_valid_remove(command)){}
-	else if(is_valid_undo(command)){}
-	else if(is_valid_redo(command)){}
-	else if(is_valid_clear(command)){}
-	else if(is_valid_help(command)){}
+	else if(is_valid_set(token_command)){}
+	else if(is_valid_reset(token_command)){}
+	else if(is_valid_edit(token_command)){}
+	else if(is_valid_remove(token_command)){}
+	else if(is_valid_undo(token_command)){}
+	else if(is_valid_redo(token_command)){}
+	else if(is_valid_clear(token_command)){}
+	else if(is_valid_help(token_command)){
+        print_board = false;
+    }
 	else{
 		printf(RED "Error, no such command exists\n" DEFAULT);
 		print_board = false;
@@ -102,37 +107,26 @@ void get_command(){
 
 
 /*
- * check if command == "reset" and reset the board
+ * check if tokenized command == "reset" and reset the board
  */
-bool is_valid_reset(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
-
+bool is_valid_reset(char* token_command){
 	if(token_command == NULL ||
         strcmp(token_command, RESET)) {
 		return false;
 	}
-    /* using NULL will continue to tokinize command */
-	char *token_end = strtok(NULL, glob_delemeter);
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	board_reset();
+    
+    if(is_command_end()){
+        board_reset();
+    }
 	return true;
 }
 
 
 /*
- * check if command == "set val x y" board[x][y] = val, unless
+ * check if tokenized command == "set val x y" board[x][y] = val, unless
  * val/x/y is out of bounds
  */
-bool is_valid_set(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
-
+bool is_valid_set(char* token_command){
 	if(token_command == NULL ||
         strcmp(token_command, SET)) {
 		return false;
@@ -140,7 +134,6 @@ bool is_valid_set(char* command){
 	char *token_val = strtok(NULL, glob_delemeter);
 	char *token_x = strtok(NULL, glob_delemeter);
 	char *token_y = strtok(NULL, glob_delemeter);
-	char *token_end = strtok(NULL, glob_delemeter);
 
 	if(token_val == NULL ||
 		token_x == NULL ||
@@ -160,25 +153,20 @@ bool is_valid_set(char* command){
 		printf(RED "Error, Y must be an int.\n" DEFAULT);
 		return true;
 	}
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	move_set(atoi(token_val), atoi(token_x), atoi(token_y));
-	return true;
+    
+    if(is_command_end()){
+        move_set(atoi(token_val), atoi(token_x), atoi(token_y));
+    }
+    return true;
 }
 
 
 /*
- * check if command == "edit val x y" board[x][y] = val, unless
+ * check if tokenized command == "edit val x y" board[x][y] = val, unless
  * board[x][y] is empty
  * val/x/y is out of bounds
  */
-bool is_valid_edit(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
-
+bool is_valid_edit(char* token_command){
 	if(token_command == NULL ||
         strcmp(token_command, EDIT)) {
 		return false;
@@ -186,7 +174,6 @@ bool is_valid_edit(char* command){
 	char *token_val = strtok(NULL, glob_delemeter);
 	char *token_x = strtok(NULL, glob_delemeter);
 	char *token_y = strtok(NULL, glob_delemeter);
-	char *token_end = strtok(NULL, glob_delemeter);
 
 	if(token_val == NULL ||
 		token_x == NULL ||
@@ -206,32 +193,26 @@ bool is_valid_edit(char* command){
 		printf(RED "Error, Y must be an int.\n" DEFAULT);
 		return true;
 	}
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	move_edit(atoi(token_val), atoi(token_x), atoi(token_y));
+
+    if(is_command_end()){
+        move_edit(atoi(token_val), atoi(token_x), atoi(token_y));
+    }
 	return true;
 }
 
 
 /*
- * check if command == "remove x y" board[x][y] = empty, unless
+ * check if tokenized command == "remove x y" board[x][y] = empty, unless
  * board[x][y] is empty
  * x/y is out of bounds
  */
-bool is_valid_remove(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
-
+bool is_valid_remove(char* token_command){
 	if (token_command == NULL ||
         strcmp(token_command, REMOVE)) {
 		return false;
 	}
 	char *token_x = strtok(NULL, glob_delemeter);
 	char *token_y = strtok(NULL, glob_delemeter);
-	char *token_end = strtok(NULL, glob_delemeter);
 
 	if(token_x == NULL ||
 	   token_y == NULL){
@@ -246,131 +227,95 @@ bool is_valid_remove(char* command){
 		printf(RED "Error, Y must be an int.\n" DEFAULT);
 		return true;
 	}
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	move_remove(atoi(token_x), atoi(token_y));
+    
+    if(is_command_end()){
+        move_remove(atoi(token_x), atoi(token_y));
+    }
 	return true;
 }
 
 
 /*
- * check if command == "undo" then reverse the last move, unless
+ * check if tokenized command == "undo" then reverse the last move, unless
  * there are no more moves do undo
  */
-bool is_valid_undo(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
-
+bool is_valid_undo(char* token_command){
 	if (token_command == NULL ||
         strcmp(token_command, UNDO)) {
 		return false;
 	}
-	char *token_end = strtok(NULL, glob_delemeter);
 
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	move_undo();
+    if(is_command_end()){
+        move_undo();
+    }
 	return true;
 }
 
 
 /*
- * check if command == "redo" then redo the last move, unless
+ * check if tokenized command == "redo" then redo the last move, unless
  * there are no more moves do redo
  */
-bool is_valid_redo(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
+bool is_valid_redo(char* token_command){
     if (token_command == NULL ||
         strcmp(token_command, REDO)) {
 		return false;
 	}
-	char *token_end = strtok(NULL, glob_delemeter);
-
-	if(token_command == NULL ||
-       token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-	move_redo();
+    if(is_command_end()){
+        move_redo();
+    }
 	return true;
 }
 
 
 /*
- * check if command == "exit" then free memory and terminate
+ * check if tokenized command == "exit" then free memory and terminate
  */
-bool is_valid_exit(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
+bool is_valid_exit(char* token_command){
     if (token_command == NULL ||
         strcmp(token_command, EXIT)) {
 		return false;
 	}
-    /* using NULL will continue to tokinize command */
-	char *token_end = strtok(NULL, glob_delemeter);
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
 	return true;
 }
 
 
 /*
- * check if command == "clear" then clear the screen
+ * check if tokenized command == "clear" then clear the screen
  */
-bool is_valid_clear(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
+bool is_valid_clear(char* token_command){
 	if (token_command == NULL ||
         strcmp(token_command, CLEAR)) {
 		return false;
 	}
-    /* using NULL will continue to tokinize command */
-	char *token_end = strtok(NULL, glob_delemeter);
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-    system("clear");
+    
+    if(is_command_end()){
+        system("clear");
+    }
 	return true;
 }
 
 
 /*
- * check if command == "help" then display all the command options
+ * check if tokenized command == "help" then display all the command options
  */
-bool is_valid_help(char* command){
-	char command_tmp[M];
-	strcpy(command_tmp, command);
-	char *token_command = strtok(command_tmp, glob_delemeter); /* tokinize command */
+bool is_valid_help(char* token_command){
 	if (token_command == NULL ||
         strcmp(token_command, HELP)) {
 		return false;
 	}
-    /* using NULL will continue to tokinize command */
-	char *token_end = strtok(NULL, glob_delemeter);
-	if(token_end != NULL){
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
-		return true;
-	}
-    system("clear");
-	printf("Available commands:\n" STARS "set VAL:int X:int Y:int => [X][Y] = Val\n"
-		STARS "remove X:int Y:int => [X][Y] = EMPTY\n"
-		STARS "undo => undo last move\n"
-		STARS "redo => redo last move\n"
-		STARS "clear => clear terminal\n"
-		STARS "reset => reset board\n"
-		STARS "exit => end program\n");
+
+    if(is_command_end()){
+        system("clear");
+        printf("Available commands:\n" STARS "set VAL:int X:int Y:int => [X][Y] = Val\n"
+            STARS "remove X:int Y:int => [X][Y] = EMPTY\n"
+            STARS "edit VAL:int X:int Y:int => [X][Y] = Val\n"
+            STARS "undo => undo last move\n"
+            STARS "redo => redo last move\n"
+            STARS "clear => clear terminal\n"
+            STARS "reset => reset board\n"
+            STARS "exit => end program\n");
+    }
 	return true;
 }
 
@@ -389,3 +334,19 @@ bool is_number(char* token){
 	}
 	return true;
 }
+
+
+/*
+ * method called at the end of a is_valid_... method to check if there are any
+ * more arguments passed. If that is the case then an error is printed out
+ */
+bool is_command_end(){
+    char *token_end = strtok(NULL, glob_delemeter);
+    /* using NULL will continue to tokinize command */
+    if(token_end != NULL){
+        printf(RED "Error, entered too many parameters.\n" DEFAULT);
+        return false;
+    }
+    return true;
+}
+

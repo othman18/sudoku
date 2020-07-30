@@ -108,6 +108,8 @@ void board_print(){
 	}
 	board_print_dashes();
 	printf("\n");
+    
+    history_print();
 }
 
 
@@ -203,7 +205,7 @@ void move_edit(int val, int x, int y){
 			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x, y);
 			break;
 		case MODE_R:
-			history_insert(val, glob_board[x][y]->val, x, y, MOVE_MOD);
+			history_insert(val, glob_board[x][y]->val, x, y, MOVE_EDI);
 			glob_board[x][y]->val = val;
 			break;
 		case MODE_F:
@@ -266,7 +268,7 @@ void move_undo(){
 			glob_board[prev_move->x][prev_move->y]->mode = MODE_R;
 			glob_board[prev_move->x][prev_move->y]->val = prev_move->val_prev;
 			break;
-		case(MOVE_MOD):
+		case(MOVE_EDI):
 			glob_board[prev_move->x][prev_move->y]->mode = MODE_R;
 			glob_board[prev_move->x][prev_move->y]->val = prev_move->val_prev;
 			break;
@@ -298,9 +300,9 @@ void move_redo(){
 			break;
 		case(MOVE_REM):
 			glob_board[prev_move->x][prev_move->y]->mode = MODE_RW;
-			glob_board[prev_move->x][prev_move->y]->val = prev_move->val_prev;
+			glob_board[prev_move->x][prev_move->y]->val = EMPTY_CELL;
 			break;
-		case(MOVE_MOD):
+		case(MOVE_EDI):
 			glob_board[prev_move->x][prev_move->y]->mode = MODE_RW;
 			glob_board[prev_move->x][prev_move->y]->val = prev_move->val;
 			break;
@@ -329,8 +331,9 @@ void history_insert(int val, int x, int y, int val_prev, int move_type){
  * internal method used for debugging
  */
 void history_print(){
-	printf("	 Move history: ");
+	printf("     Move history: ");
 	linkedlist_print_until_current(glob_move_history);
 	printf("\nFull Move history: ");
 	linkedlist_print(glob_move_history);
+    printf("\n");
 }

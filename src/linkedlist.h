@@ -10,9 +10,9 @@
 #define DEFAULT "\033[0m"
 
 #define MOVE_DUM -1
-#define MOVE_INS 0
-#define MOVE_REM 1
-#define MOVE_MOD 2
+#define MOVE_INS 0 /* INSERT */
+#define MOVE_REM 1 /* REMOVE */
+#define MOVE_EDI 2 /* EDIT */
 
 struct node{
 	int val; /* move value */

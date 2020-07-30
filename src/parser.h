@@ -24,18 +24,19 @@ void get_command();
 /*
  * user methods
  */
-bool is_valid_reset(char* command);
-bool is_valid_set(char* command);
-bool is_valid_edit(char* command);
-bool is_valid_remove(char* command);
-bool is_valid_undo(char* command);
-bool is_valid_redo(char* command);
-bool is_valid_exit(char* command);
-bool is_valid_clear(char* command);
-bool is_valid_help(char* command);
+bool is_valid_reset(char* token_command);
+bool is_valid_set(char* token_command);
+bool is_valid_edit(char* token_command);
+bool is_valid_remove(char* token_command);
+bool is_valid_undo(char* token_command);
+bool is_valid_redo(char* token_command);
+bool is_valid_exit(char* token_command);
+bool is_valid_clear(char* token_command);
+bool is_valid_help(char* token_command);
 
 /*
  * internal methods
  */
 bool is_number(char* token);
+bool is_command_end();
 #endif
