@@ -10,40 +10,53 @@ const char glob_delemeter[8] = " \t\r\n\v\f";
 
 void start_game(){
 	setbuf(stdout, NULL); /* clear stdout */
-	printf("Enter board dimensions N X N: ");
-	char *command = (char*)malloc(M);
-	if(fgets(command, M, stdin) != NULL){}
-	char *token_dim = strtok(command, glob_delemeter); /* tokinize command */
-	if(!is_number(token_dim)){
-		printf(RED "Error, dimension must be an int\n" DEFAULT);
-		free(command);
-		start_game();
-	}
-	else{
-		int dim = atoi(token_dim);
-		if(dim < 2){
-			printf(RED "Error, dimension can't be lower than 2\n" DEFAULT);
-			free(command);
-			start_game();
-		}
-		else{
-            system("clear");
-			board_init(dim);
-	/*		board_generate(dim); */
-			board_print();
-			get_command();
-			free(command);
-			board_free();
-		}
-	}
+    int size_m = -1, size_n = 0;
+    get_mn_dim(&size_m, &size_n);
+    system("clear");
+    board_init(size_m, size_n);
+    board_print();
+    get_command();
+    board_free();
+    
 }
+
+
+void get_mn_dim(int *size_m, int *size_n){
+    printf("Enter board dimensions N X N: ");
+    char *command = (char*)malloc(M);
+    if(fgets(command, M, stdin) != NULL){}
+
+    char *token_m = strtok(command, glob_delemeter); /* tokinize command */
+    char *token_n = strtok(NULL, glob_delemeter);
+
+    if(token_m == NULL ||
+       token_n == NULL){
+        printf(RED "Error, entered too few parameters.\n" DEFAULT);
+    }
+    else if(!is_number(token_m)){
+        printf(RED "Error, dimension m must be an int.\n" DEFAULT);
+    }
+    else if(!is_number(token_n)){
+        printf(RED "Error, dimension n must be an int.\n" DEFAULT);
+    }
+    else if(atoi(token_n) * atoi(token_m) < 9){
+        printf(RED "Error, dimension mXn can't be lower than 9\n" DEFAULT);
+    }else{
+        *size_m = atoi(token_m);
+        *size_n = atoi(token_n);
+        return;
+    }
+    free(command);
+    get_mn_dim(size_m, size_n);
+}
+
 
 /*
  * get the command entered by the user and check if it's a valid command
  * print error otherwise and wait for the next command
  */
 void get_command(){
-    get_command_list();
+    print_command_list_msg();
 	printf("Enter command: ");
 	char *command = (char*)malloc(M);
 	if(fgets(command, M, stdin) != NULL){}
@@ -73,7 +86,7 @@ void get_command(){
 }
 
 
-void get_command_list(){
+void print_command_list_msg(){
     printf("To list game commands, type \"help\"\n");
 }
 

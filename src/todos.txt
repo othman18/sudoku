@@ -4,4 +4,6 @@ TODO
 		check if solved board
 		get hint
 
-	bug when giving empty string to enter command
+
+BUGS 	
+	invert X Y when printing

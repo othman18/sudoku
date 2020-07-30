@@ -7,14 +7,16 @@
  * global variables
  */
 struct cell ***glob_board = NULL;
-int glob_board_size = 0;
+int glob_board_size = 0;   /* X*Y */
+int glob_board_size_n = 0; /* X dim*/
+int glob_board_size_m = 0; /* Y dim*/
 struct linkedlist *glob_move_history = NULL;
 
 
 /*
  * init a cell with read/write mode and a default value = 0
  */
-struct cell* init_cell(){
+struct cell* cell_init(){
 	struct cell *new_cell = (struct cell*) malloc(sizeof(struct cell));
 	new_cell->val = EMPTY_CELL;
 	new_cell->mode = MODE_RW;
@@ -25,24 +27,25 @@ struct cell* init_cell(){
 /*//////////////////////////////////////BOARD METHODS///////////////////////////*/
 
 
-void board_init(int board_size){
-	if(board_size < 2){
+void board_init(int size_m, int size_n){
+	if(size_m * size_n < 2){
 		printf(RED "Board size can't be lower than 2\n" DEFAULT);
 		return;
 	}
 	if(glob_board != NULL){
 		board_free();
 	}
+    glob_board_size_n = size_n;
+    glob_board_size_m = size_m;
+	glob_board_size = glob_board_size_m * glob_board_size_n;
+	glob_board = (struct cell***) malloc(glob_board_size * sizeof(struct cell));
 
-	glob_board_size = board_size;
-	glob_board = (struct cell***) malloc(board_size * sizeof(struct cell));
-
-	for(int i = 0; i < board_size; i++){
-		glob_board[i] = (struct cell**) malloc(board_size * sizeof(struct cell));
+	for(int i = 0; i < glob_board_size; i++){
+		glob_board[i] = (struct cell**) malloc(glob_board_size *                                              sizeof(struct cell));
 	}
-	for(int i = 0; i < board_size; i++){
-		for(int j = 0; j < board_size; j++){
-			glob_board[i][j] = init_cell();
+	for(int i = 0; i < glob_board_size; i++){
+		for(int j = 0; j < glob_board_size; j++){
+			glob_board[i][j] = cell_init();
 		}
 	}
 }
@@ -75,39 +78,34 @@ void board_print(){
 		return;
 	}
 
-	board_print_dashes(glob_board_size);
 	for(int i = 0; i < glob_board_size; i++){
-		printf("\n|");
+        if(i % glob_board_size_n == 0){
+            board_print_dashes();
+            printf("\n");
+        }
 		for(int j = 0; j < glob_board_size; j++){
+            if(j % glob_board_size_m == 0){
+                printf("|");
+            }
 			if(glob_board[i][j]->val == EMPTY_CELL){
-				board_print_spaces(0);
-				printf("|");
-			}
+                printf("    ");
+            }
 			else if(glob_board[i][j]->mode == MODE_F){
-				board_print_spaces(glob_board[i][j]->val * 10);
-				printf(".%d|", glob_board[i][j]->val);
+				printf("%2d.", glob_board[i][j]->val);
 			}
 			else{
-				board_print_spaces(glob_board[i][j]->val);
-				printf("%d|", glob_board[i][j]->val);
+				printf(" %2d ", glob_board[i][j]->val);
 			}
 		}
+        printf("|\n");
 	}
-	printf("\n");
-	board_print_dashes(glob_board_size);
+	board_print_dashes();
 	printf("\n");
 }
 
-void board_print_dashes(int num){
-	for(int i = 0; i < num * 4 + 1; i++){
+void board_print_dashes(){
+	for(int i = 0; i < glob_board_size * 4 + glob_board_size_n + 1; i++){
 		printf("-");
-	}
-}
-
-
-void board_print_spaces(int num){
-	for(int i = num_digits(num); i <= num_digits(glob_board_size); i++){
-		printf(" ");
 	}
 }
 
@@ -118,16 +116,10 @@ void board_reset(){
 		return;
 	}
 	board_free();
-	board_init(glob_board_size);
+	board_init(glob_board_size_m, glob_board_size_n);
 }
 
-
-int num_digits(int num){
-	/* special case 0 return 0 */
-	return (num == 0) ? 0: log10(num) + 1;
-}
-
-
+    
 /*//////////////////////////////////////MOVE METHODS////////////////////////////*/
 
 

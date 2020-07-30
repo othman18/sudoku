@@ -1,8 +1,0 @@
-TODO
-	implement gurovi support and add:
-		generate board
-		check if solved board
-		get hint
-
-BUGS:
-	-

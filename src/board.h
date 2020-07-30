@@ -1,6 +1,5 @@
 /* board.h */
 #include "linkedlist.h"
-#include <math.h> /* for using log10 */
 
 #ifndef BOARD_H_
 #define BOARD_H_
@@ -18,18 +17,16 @@ struct cell{
 	int val;
 };
 
-struct cell* init_cell();
+struct cell* cell_init();
 
 /*
  * modify board methods
  */
-void board_init(int board_size);
+void board_init(int size_m, int size_n);
 void board_free();
 void board_print();
-void board_print_dashes(int num);
-void board_print_spaces(int num);
+void board_print_dashes();
 void board_reset();
-int num_digits(int num);
 
 /*
  * move methods
