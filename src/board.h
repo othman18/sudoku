@@ -12,7 +12,7 @@
 #define BOARD_MAX_PRINT_SIZE 30
 #define VALID_MOVE_VAL 1
 
-struct cell{
+struct cell {
 	int mode; /* 0 = read/write, 1 = read, 2 = fixed */
 	int val;
 };
@@ -53,7 +53,7 @@ void move_redo();
  * MOVE_MOD 2
  */
 void history_insert(int val, int x, int y, int val_prev,
-	int move_type); /* 0 = insert, 1 = remove, 2 = modify */
+                    int move_type); /* 0 = insert, 1 = remove, 2 = modify */
 void history_print();
 
 #endif

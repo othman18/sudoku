@@ -1,9 +1,9 @@
 /* tests.c */
 #include "tests.h"
 
-void run_tests(){
-    /* tests for valgrind */
-    /* test1();
+void run_tests() {
+	/* tests for valgrind */
+	/* test1();
 	test2();
 	test3();
 	test4();
@@ -123,6 +123,4 @@ void test7(){
 	board_free();
 }
 
-
 #endif
-
