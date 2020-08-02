@@ -43,7 +43,7 @@ void board_init(int size_m, int size_n){
 	glob_board = (struct cell***) malloc(glob_board_size * sizeof(struct cell));
 
 	for(int i = 0; i < glob_board_size; i++){
-		glob_board[i] = (struct cell**) malloc(glob_board_size *                                              sizeof(struct cell));
+		glob_board[i] = (struct cell**) malloc(glob_board_size * sizeof(struct cell));
 	}
 	for(int i = 0; i < glob_board_size; i++){
 		for(int j = 0; j < glob_board_size; j++){
@@ -73,27 +73,50 @@ void board_free(){
 
 
 /*
+ * return true if board is already init, otherwise print an error message and
+ * return false 
+ */
+bool board_is_init(){
+	if(glob_board == NULL){
+		printf(RED "Board not init\n" DEFAULT);
+		return false;
+	}
+	return true;
+}
+
+
+/*
  * print board to console
  */
 void board_print(){
-	if(glob_board == NULL){
-		printf(RED "Board not init\n" DEFAULT);
+	if(!board_is_init()){
 		return;
 	}
 	if(glob_board_size > BOARD_MAX_PRINT_SIZE){
 		printf("board too big to print\n");
 		return;
 	}
-
+	
+	/* print X values on top of board */
+	for(int i = 0; i < glob_board_size; i++){
+		if(i % glob_board_size_m == 0){
+			/*empty space since the board starts with a '|' */
+			printf(" ");
+		}
+        printf(" %2d ", i);
+    }
+    
+    printf("\n");
+    
 	for(int i = 0; i < glob_board_size; i++){
         if(i % glob_board_size_n == 0){
             board_print_dashes();
-            printf("\n");
         }
 		for(int j = 0; j < glob_board_size; j++){
             if(j % glob_board_size_m == 0){
                 printf("|");
             }
+
 			if(glob_board[i][j]->val == EMPTY_CELL){
                 printf("    ");
             }
@@ -104,10 +127,13 @@ void board_print(){
 				printf(" %2d ", glob_board[i][j]->val);
 			}
 		}
-        printf("|\n");
+		/* print last border as well as the line number */
+        printf("|%d\n", i);
 	}
 	board_print_dashes();
-	printf("\n");
+
+    printf("\n");
+	history_print();
 }
 
 
@@ -118,6 +144,7 @@ void board_print_dashes(){
 	for(int i = 0; i < glob_board_size * 4 + glob_board_size_n + 1; i++){
 		printf("-");
 	}
+	printf("\n");
 }
 
 
@@ -125,8 +152,7 @@ void board_print_dashes(){
  * reset board
  */
 void board_reset(){
-	if(glob_board == NULL){
-		printf(RED "Board not init\n" DEFAULT);
+	if(!board_is_init()){
 		return;
 	}
 	board_free();
@@ -137,31 +163,101 @@ void board_reset(){
 /*//////////////////////////////////////MOVE METHODS////////////////////////////*/
 
 
+bool move_is_valid(int val, int x, int y){
+	return move_is_valid_coordinate(x,y) &&
+		move_is_valid_range(val) &&
+		move_is_valid_horizontal(val, y) &&
+		move_is_valid_vertical(val, x) &&
+		move_is_valid_block(val, x, y);
+}
+
 /*
  * check if move is in bounds
  */
-bool move_is_valid(int val, int x, int y){
-	bool valid_b = true;
-	printf(RED);
-
-	if(glob_board == NULL){
-		printf(RED "Board not init\n" DEFAULT);
-		valid_b = false;
-	}
+bool move_is_valid_coordinate(int x, int y){
+	if(!board_is_init()){}
 	else if(x < 0 ||x >= glob_board_size){
 		printf(RED "Invalid move, x: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, x, glob_board_size - 1);
-		valid_b = false;
+		return false;
 	}
 	else if(y < 0 || y >= glob_board_size){
 		printf(RED "Invalid move, y: %d out of board bounds (min: 0, max: %d)\n" DEFAULT, y, glob_board_size - 1);
-		valid_b = false;
+		return false;
 	}
-	else if(val < 1 || val > glob_board_size){
-		printf(RED "Invalid move, val: %d out of board bounds (min: 1, max: %d)\n" DEFAULT, val, glob_board_size);
-		valid_b = false;
+		return true;
+}
+
+
+/*
+ * check if move val is in the right range
+ */
+bool move_is_valid_range(int val){
+	if(val < 1 || val > glob_board_size){
+		printf(RED "Invalid move, val: %d out of move range (min: 1, max: %d)\n" DEFAULT, val, glob_board_size);
+		return false;
 	}
-	printf(DEFAULT);
-	return valid_b;
+	return true;
+}
+
+
+/*
+ * iterate through board[...][y] and return false if val is present in any other cell
+ */
+bool move_is_valid_horizontal(int val, int y){
+	if(!board_is_init()){
+		return false;
+	}
+
+	for(int i = 0; i < glob_board_size; i++){
+		if(glob_board[i][y]->val == val){
+			printf(RED "Invalid move, val: %d already present in horizontal line %d\n" DEFAULT, val, y);
+			return false;
+		}
+	}
+	return true;
+}
+
+
+/*
+ * iterate through board[x][...] and return false if val is present in any other cell
+ */
+bool move_is_valid_vertical(int val, int x){
+	if(!board_is_init()){
+		return false;
+	}
+
+	for(int i = 0; i < glob_board_size; i++){
+		if(glob_board[x][i]->val == val){
+			printf(RED "Invalid move, val: %d already present in vertical line %d\n" DEFAULT, val, x);
+			return false;
+		}
+	}
+	return true;
+}
+
+
+/*
+ * iterate through the current block and return false if val is already present
+ */
+bool move_is_valid_block(int val, int x, int y){
+	if(!board_is_init()){
+		return false;
+	}
+	
+	int x_block = x / glob_board_size_n;
+	int y_block = y / glob_board_size_m;
+	int x_new = x_block * glob_board_size_n;
+	int y_new = y_block * glob_board_size_m;
+
+	for(int i = 0; i < glob_board_size_n; i++){
+		for(int j = 0; j < glob_board_size_m; j++){
+			if(glob_board[x_new + i][y_new + j]->val == val){
+				printf(RED "Invalid move, val: %d already present in block[%d][%d]\n" DEFAULT, val, x_block, y_block);
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 
@@ -198,6 +294,7 @@ void move_edit(int val, int x, int y){
 	if(!move_is_valid(val, x, y)){
 		return;
 	}
+	
 	switch(glob_board[x][y]->mode){
 		case MODE_RW:
 			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x, y);
@@ -221,7 +318,7 @@ void move_edit(int val, int x, int y){
  * insert old value into the history
  */
 void move_remove(int x, int y){
-	if(!move_is_valid(VALID_MOVE_VAL, x, y)){
+	if(!move_is_valid_coordinate(x, y)){
 		return;
 	}
 	switch(glob_board[x][y]->mode){
@@ -230,7 +327,7 @@ void move_remove(int x, int y){
 			break;
 		case MODE_R:
 			glob_board[x][y]->mode = MODE_RW;
-			history_insert(EMPTY_CELL, glob_board[x][y]->val, x, y, MOVE_REM);
+			history_insert(EMPTY_CELL, x, y, glob_board[x][y]->val, MOVE_REM);
 			glob_board[x][y]->val = EMPTY_CELL;
 			break;
 		case MODE_F:
@@ -245,8 +342,7 @@ void move_remove(int x, int y){
  * remove prev move and clear the board where it was set.
  */
 void move_undo(){
-	if(glob_board == NULL){
-		printf(RED "Board not init\n" DEFAULT);
+	if(!board_is_init()){
 		return;
 	}
 
@@ -281,8 +377,7 @@ void move_undo(){
  * since this is a previously inserted move, which was already validated
  */
 void move_redo(){
-	if(glob_board == NULL){
-		printf(RED "Board not init\n" DEFAULT);
+	if(!board_is_init()){
 		return;
 	}
 
@@ -331,7 +426,7 @@ void history_insert(int val, int x, int y, int val_prev, int move_type){
 void history_print(){
 	printf("     Move history: ");
 	linkedlist_print_until_current(glob_move_history);
-	printf("\nFull Move history: ");
+	printf("Full Move history: ");
 	linkedlist_print(glob_move_history);
     printf("\n");
 }
