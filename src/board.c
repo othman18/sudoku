@@ -7,7 +7,7 @@
  * global variables
  */
 struct cell ***glob_board = NULL;
-int glob_board_size = 0;   /* X*Y */
+int glob_board_size = 0;   /* X * Y */
 int glob_board_size_n = 0; /* X dim*/
 int glob_board_size_m = 0; /* Y dim*/
 struct linkedlist *glob_move_history = NULL;
@@ -23,7 +23,7 @@ struct cell *cell_init() {
 }
 
 /*//////////////////////////////////////BOARD
- * METHODS///////////////////////////*/
+ * FUNCTIONS///////////////////////////*/
 
 /*
  * init board struct with dimensions n and m
@@ -72,18 +72,6 @@ void board_free() {
 }
 
 /*
- * return true if board is already init, otherwise print an error message and
- * return false
- */
-bool board_is_init() {
-	if (glob_board == NULL) {
-		printf(RED "Board not init\n" DEFAULT);
-		return false;
-	}
-	return true;
-}
-
-/*
  * print board to console
  */
 void board_print() {
@@ -129,7 +117,7 @@ void board_print() {
 	board_print_dashes();
 
 	printf("\n");
-	history_print();
+	// history_print();
 }
 
 /*
@@ -153,8 +141,53 @@ void board_reset() {
 	board_init(glob_board_size_m, glob_board_size_n);
 }
 
+/*
+ * return true if board is already init, otherwise print an error message and
+ * return false
+ */
+bool board_is_init() {
+	if (glob_board == NULL) {
+		printf(RED "Board not init\n" DEFAULT);
+		return false;
+	}
+	return true;
+}
+
+int counter = 0;
+bool board_bt_solve(int x, int y) {
+	for (int i = 1; i <= glob_board_size; i++) {
+		counter++;
+		if (!move_is_valid(i, x, y)) {
+			continue;
+		}
+
+		move_set(i, x, y);
+
+		int new_x = 0, new_y = y;
+		if (x == glob_board_size - 1) {
+			new_x = 0;
+			new_y = y + 1;
+		} else {
+			new_x = x + 1;
+		}
+
+		if (new_y == glob_board_size) {
+			printf("finished with counter = %d\n", counter);
+			counter = 0;
+			return true;
+		}
+
+		if (board_bt_solve(new_x, new_y)) {
+			return true;
+		} else {
+			move_remove(x, y);
+		}
+	}
+	return false;
+}
+
 /*//////////////////////////////////////MOVE
- * METHODS////////////////////////////*/
+ * FUNCTIONS////////////////////////////*/
 
 bool move_is_valid(int val, int x, int y) {
 	return move_is_valid_coordinate(x, y) && move_is_valid_range(val) &&
@@ -414,7 +447,7 @@ void move_redo() {
 }
 
 /*//////////////////////////////////////HISTORY
- * METHODS/////////////////////////*/
+ * FUNCTIONS/////////////////////////*/
 
 /*
  * add move to history, first node in the history is a dummy node which will
@@ -430,7 +463,7 @@ void history_insert(int val, int x, int y, int val_prev, int move_type) {
 }
 
 /*
- * internal method used for debugging
+ * internal function used for debugging
  */
 void history_print() {
 	printf("     Move history: ");

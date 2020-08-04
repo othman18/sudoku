@@ -10,7 +10,6 @@
 #define MODE_F 2
 
 #define BOARD_MAX_PRINT_SIZE 30
-#define VALID_MOVE_VAL 1
 
 struct cell {
 	int mode; /* 0 = read/write, 1 = read, 2 = fixed */
@@ -28,6 +27,7 @@ void board_print();
 void board_print_dashes();
 void board_reset();
 bool board_is_init();
+bool board_bt_solve(int x, int y); /* backtracking solve*/
 
 /*
  * move methods
