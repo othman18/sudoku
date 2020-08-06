@@ -8,6 +8,8 @@
 const char glob_delemeter[8] = " \t\r\n\v\f";
 
 void start_game() {
+	system("clear");
+	printf("Starting game!\n");
 	setbuf(stdout, NULL); /* clear stdout */
 	int size_m = -1, size_n = 0;
 	get_mn_dim(&size_m, &size_n);
@@ -30,9 +32,9 @@ void get_mn_dim(int *size_m, int *size_n) {
 	bool ok_m = false, ok_n = false;
 
 	if (token_m == NULL) {
-		printf(RED "Error, entered too few parameters.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_FEW);
 	} else if (!is_number(token_m)) {
-		printf(RED "Error, dimension m must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_MANY);
 	} else {
 		*size_m = atoi(token_m);
 		ok_m = true;
@@ -41,7 +43,7 @@ void get_mn_dim(int *size_m, int *size_n) {
 			*size_n = atoi(token_m);
 			ok_n = true;
 		} else if (!is_number(token_n)) {
-			printf(RED "Error, dimension n must be an int.\n" DEFAULT);
+			parser_error_handler(ERROR_INVALID_DIM);
 		} else {
 			*size_n = atoi(token_n);
 			ok_n = true;
@@ -50,12 +52,11 @@ void get_mn_dim(int *size_m, int *size_n) {
 
 	free(command);
 
-	if (!ok_n || !ok_m || (*size_n) * (*size_m) < MIN_BOARD_SIZE ||
-	    (*size_n) * (*size_m) > MAX_BOARD_SIZE) {
-		printf(RED
-		       "Error, dimension mXn can't be lower than %d nor greater than "
-		       "%d\n" DEFAULT,
-		       MIN_BOARD_SIZE, MAX_BOARD_SIZE);
+	if (!ok_n || !ok_m) {
+		get_mn_dim(size_m, size_n);
+	} else if ((*size_n) * (*size_m) < MIN_BOARD_SIZE ||
+	           (*size_n) * (*size_m) > MAX_BOARD_SIZE) {
+		parser_error_handler(ERROR_ARGUMENT_MAX_MIN_DIM);
 		get_mn_dim(size_m, size_n);
 	}
 }
@@ -85,7 +86,7 @@ void get_command() {
 	} else if (is_valid_help(token_command)) {
 		print_board = false;
 	} else {
-		printf(RED "Error, no such command exists\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_COMMAND);
 		print_board = false;
 	}
 
@@ -116,19 +117,19 @@ bool is_valid_set(char *token_command) {
 	char *token_y = strtok(NULL, glob_delemeter);
 
 	if (token_val == NULL || token_x == NULL || token_y == NULL) {
-		printf(RED "Error, entered too few parameters.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_FEW);
 		return true;
 	}
 	if (!is_number(token_val)) {
-		printf(RED "Error, val must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_VAL);
 		return true;
 	}
 	if (!is_number(token_x)) {
-		printf(RED "Error, X must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_X);
 		return true;
 	}
 	if (!is_number(token_y)) {
-		printf(RED "Error, Y must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_Y);
 		return true;
 	}
 	/* make sure there's nothing left to tokinze */
@@ -147,19 +148,19 @@ bool is_valid_edit(char *token_command) {
 	char *token_y = strtok(NULL, glob_delemeter);
 
 	if (token_val == NULL || token_x == NULL || token_y == NULL) {
-		printf(RED "Error, entered too few parameters.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_FEW);
 		return true;
 	}
 	if (!is_number(token_val)) {
-		printf(RED "Error, val must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_VAL);
 		return true;
 	}
 	if (!is_number(token_x)) {
-		printf(RED "Error, X must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_X);
 		return true;
 	}
 	if (!is_number(token_y)) {
-		printf(RED "Error, Y must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_Y);
 		return true;
 	}
 	/* make sure there's nothing left to tokinze */
@@ -177,15 +178,15 @@ bool is_valid_remove(char *token_command) {
 	char *token_y = strtok(NULL, glob_delemeter);
 
 	if (token_x == NULL || token_y == NULL) {
-		printf(RED "Error, entered too few parameters.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_FEW);
 		return true;
 	}
 	if (!is_number(token_x)) {
-		printf(RED "Error, X must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_X);
 		return true;
 	}
 	if (!is_number(token_y)) {
-		printf(RED "Error, Y must be an int.\n" DEFAULT);
+		parser_error_handler(ERROR_INVALID_Y);
 		return true;
 	}
 	/* make sure there's nothing left to tokinze */
@@ -259,7 +260,9 @@ bool is_valid_solve(char *token_command) {
 	}
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
+        board_flip_error_msg_flag();
 		board_bt_solve(0, 0);
+        board_flip_error_msg_flag();
 	}
 	return true;
 }
@@ -280,8 +283,44 @@ bool is_command_end() {
 	char *token_end = strtok(NULL, glob_delemeter);
 	/* using NULL will continue to tokenize command */
 	if (token_end != NULL) {
-		printf(RED "Error, entered too many parameters.\n" DEFAULT);
+		parser_error_handler(ERROR_ARGUMENT_MANY);
 		return false;
 	}
 	return true;
+}
+
+void parser_error_handler(PARSER_ERROR err) {
+	printf(RED);
+	switch (err) {
+		case (ERROR_ARGUMENT_FEW):
+			printf("Error, entered insufficient arguments!\n");
+			break;
+		case (ERROR_ARGUMENT_MANY):
+			printf("Error, entered too many arguments!\n");
+			break;
+		case (ERROR_ARGUMENT_MAX_MIN_DIM):
+			printf(
+			    "Error, dimension mXn can't be lower than %d nor greater than "
+			    "%d!\n",
+			    MIN_BOARD_SIZE, MAX_BOARD_SIZE);
+			break;
+		case (ERROR_INVALID_DIM):
+			printf("Error, dimension must be an int!\n");
+			break;
+		case (ERROR_INVALID_COMMAND):
+			printf("Error, no such command exists!\n");
+			break;
+		case (ERROR_INVALID_VAL):
+			printf("Error, invalid val argument!\n");
+			break;
+		case (ERROR_INVALID_X):
+			printf("Error, invalid X argument!\n");
+			break;
+		case (ERROR_INVALID_Y):
+			printf("Error, invalid Y argument!\n");
+			break;
+		default:
+			break;
+	}
+	printf(DEFAULT);
 }

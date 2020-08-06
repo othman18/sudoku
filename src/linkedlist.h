@@ -132,26 +132,16 @@ bool linkedlist_forward_current(struct linkedlist *lst);
 bool linkedlist_rewind_current(struct linkedlist *lst);
 
 /**
- * On success, the function prints out the linkedlist HEAD ---> TAIL with the
- * fillowing format: VAL:DUM - value of the dummy node = -1 VAL:INS - value of
- * the inserted node VAL:REM - value of the removed node (before removing it)
- * VAL:EDI - value of the edited node (before editing it)
- * If however the linkedlist pointer was NULL then the function will exit
- * without creating a new node.
- * @param lst - given linkedlist pointer to print
- */
-void linkedlist_print(struct linkedlist *lst);
-
-/**
  * On success, the function prints out the linkedlist HEAD ---> CURRENT_MOVE
  * with the fillowing format: VAL:DUM - value of the dummy node = -1 VAL:INS -
  * value of the inserted node VAL:REM - value of the removed node (before
  * removing it) VAL:EDI - value of the edited node (before editing it) If
  * however the linkedlist pointer was NULL then the function will exit without
  * creating a new node.
- * @param lst - given linkedlist pointer ti print till current_move
+ * @param lst - given linkedlist pointer
+ * @param until_node - given node pointer. Print from head node untill this node
  */
-void linkedlist_print_until_current(struct linkedlist *lst);
+void linkedlist_print(struct linkedlist *lst, struct node *until_node);
 
 /**
  * On success, the given linkedlist pointer will be freed as well as all the
@@ -160,4 +150,16 @@ void linkedlist_print_until_current(struct linkedlist *lst);
  * @param lst - given linkedlist pointer to free
  */
 void linkedlist_free(struct linkedlist **lst);
+
+typedef enum LL_ERROR {
+	ERROR_NODE_ALREADY_INIT,
+	ERROR_NODE_NOT_INIT,
+	ERROR_LL_ALREADY_INIT,
+	ERROR_LL_EMPTY,
+	ERROR_LL_NOT_INIT,
+	ERROR_LL_CURR_MOVE_NOT_INIT,
+	SUCESS,
+} LL_ERROR;
+
+void ll_error_handler(LL_ERROR err);
 #endif /*LINKEDLIST_H_*/

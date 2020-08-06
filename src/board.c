@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-/*
+/**
  * global variables
  */
 struct cell ***glob_board = NULL;
@@ -11,10 +11,8 @@ int glob_board_size = 0;   /* X * Y */
 int glob_board_size_n = 0; /* X dim*/
 int glob_board_size_m = 0; /* Y dim*/
 struct linkedlist *glob_move_history = NULL;
+bool glob_erro_msg_flag = true; /* allow printing messages */
 
-/*
- * init a cell with read/write mode and a default value = 0
- */
 struct cell *cell_init() {
 	struct cell *new_cell = (struct cell *)malloc(sizeof(struct cell));
 	new_cell->val = EMPTY_CELL;
@@ -25,12 +23,10 @@ struct cell *cell_init() {
 /*//////////////////////////////////////BOARD
  * FUNCTIONS///////////////////////////*/
 
-/*
- * init board struct with dimensions n and m
- */
 void board_init(int size_m, int size_n) {
-	if (size_m * size_n < 2) {
-		printf(RED "Board size can't be lower than 2\n" DEFAULT);
+	if (size_m * size_n < MIN_BOARD_SIZE) {
+		board_error_handler(ERROR_BOARD_INVALID_DIM, EMPTY_ARG, EMPTY_ARG,
+		                    EMPTY_ARG);
 		return;
 	}
 	if (glob_board != NULL) {
@@ -52,14 +48,10 @@ void board_init(int size_m, int size_n) {
 	}
 }
 
-/*
- * free board from memory
- */
 void board_free() {
 	if (glob_board == NULL) {
 		return;
 	}
-
 	for (int i = 0; i < glob_board_size; i++) {
 		for (int j = 0; j < glob_board_size; j++) {
 			free(glob_board[i][j]);
@@ -71,15 +63,8 @@ void board_free() {
 	glob_board = NULL;
 }
 
-/*
- * print board to console
- */
 void board_print() {
 	if (!board_is_init()) {
-		return;
-	}
-	if (glob_board_size > BOARD_MAX_PRINT_SIZE) {
-		printf("board too big to print\n");
 		return;
 	}
 
@@ -102,13 +87,13 @@ void board_print() {
 			if (j % glob_board_size_m == 0) {
 				printf("|");
 			}
-
-			if (glob_board[i][j]->val == EMPTY_CELL) {
+			/* i and j must be reversed to not flip the x and y axis */
+			if (glob_board[j][i]->val == EMPTY_CELL) {
 				printf("    ");
-			} else if (glob_board[i][j]->mode == MODE_F) {
-				printf("%2d.", glob_board[i][j]->val);
+			} else if (glob_board[j][i]->mode == MODE_F) {
+				printf("%2d.", glob_board[j][i]->val);
 			} else {
-				printf(" %2d ", glob_board[i][j]->val);
+				printf(" %2d ", glob_board[j][i]->val);
 			}
 		}
 		/* print last border as well as the line number */
@@ -120,9 +105,6 @@ void board_print() {
 	// history_print();
 }
 
-/*
- * print board to console
- */
 void board_print_dashes() {
 	for (int i = 0; i < glob_board_size * 4 + glob_board_size_n + 1; i++) {
 		printf("-");
@@ -130,9 +112,6 @@ void board_print_dashes() {
 	printf("\n");
 }
 
-/*
- * reset board
- */
 void board_reset() {
 	if (!board_is_init()) {
 		return;
@@ -141,22 +120,19 @@ void board_reset() {
 	board_init(glob_board_size_m, glob_board_size_n);
 }
 
-/*
- * return true if board is already init, otherwise print an error message and
- * return false
- */
 bool board_is_init() {
 	if (glob_board == NULL) {
-		printf(RED "Board not init\n" DEFAULT);
+		board_error_handler(ERROR_BOARD_NOT_INIT, EMPTY_ARG, EMPTY_ARG,
+		                    EMPTY_ARG);
 		return false;
 	}
 	return true;
 }
 
-int counter = 0;
+int bt_solve_counter = 0;
 bool board_bt_solve(int x, int y) {
 	for (int i = 1; i <= glob_board_size; i++) {
-		counter++;
+		bt_solve_counter++;
 		if (!move_is_valid(i, x, y)) {
 			continue;
 		}
@@ -172,8 +148,8 @@ bool board_bt_solve(int x, int y) {
 		}
 
 		if (new_y == glob_board_size) {
-			printf("finished with counter = %d\n", counter);
-			counter = 0;
+			printf("finished with counter = %d\n", bt_solve_counter);
+			bt_solve_counter = 0;
 			return true;
 		}
 
@@ -195,86 +171,60 @@ bool move_is_valid(int val, int x, int y) {
 	       move_is_valid_block(val, x, y);
 }
 
-/*
- * check if move is in bounds
- */
 bool move_is_valid_coordinate(int x, int y) {
 	if (!board_is_init()) {
+		return false;
 	} else if (x < 0 || x >= glob_board_size) {
-		printf(RED
-		       "Invalid move, x: %d out of board bounds (min: 0, max: "
-		       "%d)\n" DEFAULT,
-		       x, glob_board_size - 1);
+		board_error_handler(ERROR_MOVE_INVALID_X_BOUNDS, x, glob_board_size - 1,
+		                    EMPTY_ARG);
 		return false;
 	} else if (y < 0 || y >= glob_board_size) {
-		printf(RED
-		       "Invalid move, y: %d out of board bounds (min: 0, max: "
-		       "%d)\n" DEFAULT,
-		       y, glob_board_size - 1);
+		board_error_handler(ERROR_MOVE_INVALID_Y_BOUNDS, y, glob_board_size - 1,
+		                    EMPTY_ARG);
 		return false;
 	}
 	return true;
 }
 
-/*
- * check if move val is in the right range
- */
 bool move_is_valid_range(int val) {
 	if (val < 1 || val > glob_board_size) {
-		printf(RED
-		       "Invalid move, val: %d out of move range (min: 1, max: "
-		       "%d)\n" DEFAULT,
-		       val, glob_board_size);
+		board_error_handler(ERROR_MOVE_INVALID_VAL_RANGE, val, glob_board_size,
+		                    EMPTY_ARG);
 		return false;
 	}
 	return true;
 }
 
-/*
- * iterate through board[...][y] and return false if val is present in any other
- * cell
- */
 bool move_is_valid_horizontal(int val, int y) {
 	if (!board_is_init()) {
 		return false;
 	}
-
+	/* iterate through board[...][y] */
 	for (int i = 0; i < glob_board_size; i++) {
 		if (glob_board[i][y]->val == val) {
-			printf(RED
-			       "Invalid move, val: %d already present in horizontal line "
-			       "%d\n" DEFAULT,
-			       val, y);
+			board_error_handler(ERROR_MOVE_INVALID_VAL_HORIZONTAL, val, y,
+			                    EMPTY_ARG);
 			return false;
 		}
 	}
 	return true;
 }
 
-/*
- * iterate through board[x][...] and return false if val is present in any other
- * cell
- */
 bool move_is_valid_vertical(int val, int x) {
 	if (!board_is_init()) {
 		return false;
 	}
-
+	/* iterate through board[x][...] */
 	for (int i = 0; i < glob_board_size; i++) {
 		if (glob_board[x][i]->val == val) {
-			printf(RED
-			       "Invalid move, val: %d already present in vertical line "
-			       "%d\n" DEFAULT,
-			       val, x);
+			board_error_handler(ERROR_MOVE_INVALID_VAL_VERTICAL, val, x,
+			                    EMPTY_ARG);
 			return false;
 		}
 	}
 	return true;
 }
 
-/*
- * iterate through the current block and return false if val is already present
- */
 bool move_is_valid_block(int val, int x, int y) {
 	if (!board_is_init()) {
 		return false;
@@ -288,10 +238,8 @@ bool move_is_valid_block(int val, int x, int y) {
 	for (int i = 0; i < glob_board_size_n; i++) {
 		for (int j = 0; j < glob_board_size_m; j++) {
 			if (glob_board[x_new + i][y_new + j]->val == val) {
-				printf(RED
-				       "Invalid move, val: %d already present in "
-				       "block[%d][%d]\n" DEFAULT,
-				       val, x_block, y_block);
+				board_error_handler(ERROR_MOVE_INVALID_VAL_BLOCK, val, x_block,
+				                    y_block);
 				return false;
 			}
 		}
@@ -299,9 +247,6 @@ bool move_is_valid_block(int val, int x, int y) {
 	return true;
 }
 
-/*
- * set move on board only if the cell is modifiable
- */
 void move_set(int val, int x, int y) {
 	if (!move_is_valid(val, x, y)) {
 		return;
@@ -314,23 +259,18 @@ void move_set(int val, int x, int y) {
 			history_insert(val, x, y, MOVE_DUM, MOVE_INS);
 			break;
 		case MODE_R:
-			printf(RED
-			       "Invalid move, cell[%d][%d] was already set, use edit to "
-			       "modify cell\n" DEFAULT,
-			       x, y);
+			board_error_handler(ERROR_MOVE_INVALID_ALREADY_SET, x, y,
+			                    EMPTY_ARG);
 			break;
 		case MODE_F:
-			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT,
-			       x, y);
+			board_error_handler(ERROR_MOVE_INVALID_FIXED, x, y, EMPTY_ARG);
 			break;
 		default:
-			printf(RED "Invalid cell mode\n" DEFAULT);
+			board_error_handler(ERROR_MOVE_INVALID_MODE, EMPTY_ARG, EMPTY_ARG,
+			                    EMPTY_ARG);
 	}
 }
 
-/*
- * set move on board if the cell was already set
- */
 void move_edit(int val, int x, int y) {
 	if (!move_is_valid(val, x, y)) {
 		return;
@@ -338,35 +278,28 @@ void move_edit(int val, int x, int y) {
 
 	switch (glob_board[x][y]->mode) {
 		case MODE_RW:
-			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x,
-			       y);
+			board_error_handler(ERROR_MOVE_INVALID_EMPTY, x, y, EMPTY_ARG);
 			break;
 		case MODE_R:
 			history_insert(val, glob_board[x][y]->val, x, y, MOVE_EDI);
 			glob_board[x][y]->val = val;
 			break;
 		case MODE_F:
-			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT,
-			       x, y);
+			board_error_handler(ERROR_MOVE_INVALID_FIXED, x, y, EMPTY_ARG);
 			break;
 		default:
-			printf(RED "Invalid cell mode\n" DEFAULT);
+			board_error_handler(ERROR_MOVE_INVALID_MODE, EMPTY_ARG, EMPTY_ARG,
+			                    EMPTY_ARG);
 	}
 }
 
-/*
- * remove board[x][y], give it:
- * read/write mode and make it an empty cell
- * insert old value into the history
- */
 void move_remove(int x, int y) {
 	if (!move_is_valid_coordinate(x, y)) {
 		return;
 	}
 	switch (glob_board[x][y]->mode) {
 		case MODE_RW:
-			printf(RED "Invalid move, cell[%d][%d] has no value\n" DEFAULT, x,
-			       y);
+			board_error_handler(ERROR_MOVE_INVALID_EMPTY, x, y, EMPTY_ARG);
 			break;
 		case MODE_R:
 			glob_board[x][y]->mode = MODE_RW;
@@ -374,24 +307,22 @@ void move_remove(int x, int y) {
 			glob_board[x][y]->val = EMPTY_CELL;
 			break;
 		case MODE_F:
-			printf(RED "Invalid move, cell[%d][%d] has a fixed value\n" DEFAULT,
-			       x, y);
+			board_error_handler(ERROR_MOVE_INVALID_FIXED, x, y, EMPTY_ARG);
 			break;
 		default:
-			printf(RED "Invalid cell mode\n" DEFAULT);
+			board_error_handler(ERROR_MOVE_INVALID_MODE, EMPTY_ARG, EMPTY_ARG,
+			                    EMPTY_ARG);
 	}
 }
 
-/*
- * remove prev move and clear the board where it was set.
- */
 void move_undo() {
 	if (!board_is_init()) {
 		return;
 	}
 
 	if (!linkedlist_rewind_current(glob_move_history)) {
-		printf(RED "No more moves to undo\n" DEFAULT);
+		board_error_handler(ERROR_MOVE_INVALID_UNDO, EMPTY_ARG, EMPTY_ARG,
+		                    EMPTY_ARG);
 		return;
 	}
 	struct node *prev_move = glob_move_history->current_move->next;
@@ -410,21 +341,18 @@ void move_undo() {
 			glob_board[prev_move->x][prev_move->y]->val = prev_move->val_prev;
 			break;
 		default:
-			printf("TYPE ERROR IN UNDO \n");
+			printf("TYPE ERROR IN UNDO\n");
 	}
 }
 
-/*
- * restore prev move and set it. We don't need to check the move,
- * since this is a previously inserted move, which was already validated
- */
 void move_redo() {
 	if (!board_is_init()) {
 		return;
 	}
 
 	if (!linkedlist_forward_current(glob_move_history)) {
-		printf(RED "No more moves to redo\n" DEFAULT);
+		board_error_handler(ERROR_MOVE_INVALID_REDO, EMPTY_ARG, EMPTY_ARG,
+		                    EMPTY_ARG);
 		return;
 	}
 	struct node *prev_move = glob_move_history->current_move;
@@ -442,17 +370,13 @@ void move_redo() {
 			glob_board[prev_move->x][prev_move->y]->val = prev_move->val;
 			break;
 		default:
-			printf("TYPE ERROR IN UNDO \n");
+			printf("TYPE ERROR IN UNDO\n");
 	}
 }
 
 /*//////////////////////////////////////HISTORY
  * FUNCTIONS/////////////////////////*/
 
-/*
- * add move to history, first node in the history is a dummy node which will
- * never be accesed.
- */
 void history_insert(int val, int x, int y, int val_prev, int move_type) {
 	if (glob_move_history == NULL) {
 		/* dummy node */
@@ -462,13 +386,93 @@ void history_insert(int val, int x, int y, int val_prev, int move_type) {
 	linkedlist_insert(glob_move_history, val, x, y, val_prev, move_type);
 }
 
-/*
- * internal function used for debugging
- */
 void history_print() {
+	if (glob_move_history == NULL) {
+		return;
+	}
 	printf("     Move history: ");
-	linkedlist_print_until_current(glob_move_history);
+	linkedlist_print(glob_move_history, glob_move_history->current_move);
 	printf("Full Move history: ");
-	linkedlist_print(glob_move_history);
+	linkedlist_print(glob_move_history, glob_move_history->tail);
 	printf("\n");
+}
+
+void board_flip_error_msg_flag(){
+    glob_erro_msg_flag = !glob_erro_msg_flag;
+}
+
+void board_error_handler(BOARD_ERROR err, int arg0, int arg1, int arg2) {
+    if(!glob_erro_msg_flag){
+        return;
+    }
+    printf(RED);
+	switch (err) {
+		case (ERROR_BOARD_INVALID_DIM):
+			printf("Error, board size can't be lower than %d!\n",
+			       MIN_BOARD_SIZE);
+			break;
+		case (ERROR_BOARD_NOT_INIT):
+			printf("Error, board not init!\n");
+			break;
+		case (ERROR_MOVE_INVALID_X_BOUNDS):
+			printf(
+			    "Invalid move, x: %d out of board bounds (min: 0, max: %d)!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_Y_BOUNDS):
+			printf(
+			    "Invalid move, y: %d out of board bounds (min: 0, max: "
+			    "%d)!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_VAL_RANGE):
+			printf(
+			    "Invalid move, val: %d out of move range (min: 1, max: "
+			    "%d)!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_VAL_HORIZONTAL):
+			printf(
+			    "Invalid move, val: %d already present in row "
+			    "%d!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_VAL_VERTICAL):
+			printf(
+			    "Invalid move, val: %d already present in column "
+			    "%d!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_VAL_BLOCK):
+			printf(
+			    "Invalid move, val: %d already present in "
+			    "block[%d][%d]!\n",
+			    arg0, arg1, arg2);
+			break;
+		case (ERROR_MOVE_INVALID_ALREADY_SET):
+			printf(
+			    "Invalid move, cell[%d][%d] was already set, use edit to "
+			    "modify cell!\n",
+			    arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_FIXED):
+			printf("Invalid move, cell[%d][%d] has a fixed value!\n", arg0,
+			       arg1);
+			break;
+		case (ERROR_MOVE_INVALID_MODE):
+			printf("Invalid cell mode!\n");
+			break;
+		case (ERROR_MOVE_INVALID_EMPTY):
+			printf("Invalid move, cell[%d][%d] has no value!\n", arg0, arg1);
+			break;
+		case (ERROR_MOVE_INVALID_UNDO):
+			printf("No more moves to undo!\n");
+			break;
+		case (ERROR_MOVE_INVALID_REDO):
+			printf("No more moves to redo!\n");
+			break;
+		default:
+			break;
+	}
+	printf(DEFAULT);
 }

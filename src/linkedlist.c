@@ -8,7 +8,7 @@ void node_init(struct node **new_node, int val, int x, int y, int val_prev,
 	if (*new_node == NULL) {
 		*new_node = (struct node *)malloc(sizeof(struct node));
 	} else {
-		printf(RED "Error, node already init\n" DEFAULT);
+		ll_error_handler(ERROR_NODE_ALREADY_INIT);
 		return;
 	}
 	(*new_node)->val = val;
@@ -47,7 +47,7 @@ void linkedlist_init(struct linkedlist **lst, int val, int x, int y,
 	if (*lst == NULL) {
 		*lst = (struct linkedlist *)malloc(sizeof(struct linkedlist));
 	} else {
-		printf(RED "Error, linkedlist already init\n" DEFAULT);
+		ll_error_handler(ERROR_LL_ALREADY_INIT);
 		return;
 	}
 	(*lst)->head = NULL;
@@ -75,7 +75,7 @@ void linkedlist_insert(struct linkedlist *lst, int val, int x, int y,
 
 void linkedlist_remove_last(struct linkedlist *lst) {
 	if (lst == NULL || lst->tail == NULL) {
-		printf(RED "Error, empty list!\n" DEFAULT);
+		ll_error_handler(ERROR_LL_EMPTY);
 		return;
 	}
 	struct node *current_node = lst->tail;
@@ -93,8 +93,11 @@ void linkedlist_remove_last(struct linkedlist *lst) {
 }
 
 void linkedlist_remove_until_current(struct linkedlist *lst) {
-	if (lst == NULL || lst->current_move == NULL) {
-		printf(RED "Error, list or current_move not init!\n" DEFAULT);
+	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
+		return;
+	} else if (lst->current_move == NULL) {
+		ll_error_handler(ERROR_LL_CURR_MOVE_NOT_INIT);
 		return;
 	}
 	/* delete all nodes till current_move then set the current_move as the new
@@ -106,8 +109,11 @@ void linkedlist_remove_until_current(struct linkedlist *lst) {
 }
 
 bool linkedlist_forward_current(struct linkedlist *lst) {
-	if (lst == NULL || lst->current_move == NULL) {
-		printf(RED "Error, list or current_move not init!\n" DEFAULT);
+	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
+		return false;
+	} else if (lst->current_move == NULL) {
+		ll_error_handler(ERROR_LL_CURR_MOVE_NOT_INIT);
 		return false;
 	}
 	/* can't move current_mode forward, since it is tail and won't have a next*/
@@ -119,8 +125,11 @@ bool linkedlist_forward_current(struct linkedlist *lst) {
 }
 
 bool linkedlist_rewind_current(struct linkedlist *lst) {
-	if (lst == NULL || lst->current_move == NULL) {
-		printf(RED "Error, list or current_move not init!\n" DEFAULT);
+	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
+		return false;
+	} else if (lst->current_move == NULL) {
+		ll_error_handler(ERROR_LL_CURR_MOVE_NOT_INIT);
 		return false;
 	}
 	/* can't move current_mode forward, since it is head and won't have a prev*/
@@ -131,12 +140,15 @@ bool linkedlist_rewind_current(struct linkedlist *lst) {
 	return true;
 }
 
-void linkedlist_print(struct linkedlist *lst) {
+void linkedlist_print(struct linkedlist *lst, struct node *until_node) {
 	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
 		return;
+	} else if (until_node == NULL) {
+		ll_error_handler(ERROR_NODE_NOT_INIT);
 	}
 	struct node *current_node = lst->head;
-	while (current_node != NULL) {
+	while (current_node != until_node->next) {
 		switch (current_node->move_type) {
 			case (MOVE_DUM): /* dummy node */
 				printf("%d:DUM, ", current_node->val);
@@ -151,34 +163,7 @@ void linkedlist_print(struct linkedlist *lst) {
 				printf("%d:EDI, ", current_node->val_prev);
 				break;
 			default:
-				printf("TYPE ERROR");
-		}
-		current_node = current_node->next;
-	}
-	printf("\n");
-}
-
-void linkedlist_print_until_current(struct linkedlist *lst) {
-	if (lst == NULL) {
-		return;
-	}
-	struct node *current_node = lst->head;
-	while (current_node != lst->current_move->next) {
-		switch (current_node->move_type) {
-			case (MOVE_DUM): /* dummy node */
-				printf("%d:DUM, ", current_node->val);
-				break;
-			case (MOVE_INS):
-				printf("%d:INS, ", current_node->val);
-				break;
-			case (MOVE_REM):
-				printf("%d:REM, ", current_node->val_prev);
-				break;
-			case (MOVE_EDI):
-				printf("%d:EDI, ", current_node->val_prev);
-				break;
-			default:
-				printf("TYPE ERROR");
+				printf("TYPE ERROR, ");
 		}
 		current_node = current_node->next;
 	}
@@ -195,4 +180,31 @@ void linkedlist_free(struct linkedlist **lst) {
 	}
 	free(*lst);
 	*lst = NULL;
+}
+
+void ll_error_handler(LL_ERROR err) {
+	printf(RED);
+	switch (err) {
+		case (ERROR_NODE_ALREADY_INIT):
+			printf("Error, node already init!\n");
+			break;
+		case (ERROR_NODE_NOT_INIT):
+			printf("Error, node not init!\n");
+			break;
+		case (ERROR_LL_ALREADY_INIT):
+			printf("Error, linkedlist already init!\n");
+			break;
+		case (ERROR_LL_EMPTY):
+			printf("Error, empty linkedlist!\n");
+			break;
+		case (ERROR_LL_NOT_INIT):
+			printf("Error, linkedlist not init!\n");
+			break;
+		case (ERROR_LL_CURR_MOVE_NOT_INIT):
+			printf("Error, current_move not init!\n");
+			break;
+		default:
+			break;
+	}
+	printf(DEFAULT);
 }

@@ -1,9 +1,8 @@
 TODO
-	implement gurovi support and add:
-		generate board
-		check if solved board
-		get hint
-
+	implement dancing links approach
+	generate board
+	check if solved board
+	get hint
+	change the functions to return error type
 
 BUGS 	
-	invert X Y when printing

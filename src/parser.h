@@ -7,9 +7,6 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-#define MIN_BOARD_SIZE 9
-#define MAX_BOARD_SIZE 15
-
 #define RESET "reset"
 #define SET "set"
 #define EDIT "edit"
@@ -162,4 +159,18 @@ bool is_number(char* token);
  * @return - true if empty, false otherwise
  */
 bool is_command_end();
+
+typedef enum PARSER_ERROR {
+	ERROR_ARGUMENT_FEW,
+	ERROR_ARGUMENT_MANY,
+	ERROR_ARGUMENT_MAX_MIN_DIM,
+	ERROR_INVALID_DIM,
+	ERROR_INVALID_COMMAND,
+	ERROR_INVALID_VAL,
+	ERROR_INVALID_X,
+	ERROR_INVALID_Y,
+	SUCCESS,
+} PARSER_ERROR;
+
+void parser_error_handler(PARSER_ERROR err);
 #endif
