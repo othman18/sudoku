@@ -81,17 +81,8 @@ void board_reset();
  */
 void board_restart();
 
-/**
- * Check if the board was already reinitialized or not.
- * @return
- */
-bool board_is_init();
 
-/**
- * Check if the board is solved.
- * @return
- */
-bool board_is_solved();
+void board_init_fixed_history();
 
 /**
  * On success the right XY coordinate will be found for the backtracking solver
@@ -106,6 +97,40 @@ bool board_is_solved();
  * @param y - Y coordinate
  */
 bool board_solve_bt(int x, int y); /* backtracking solve*/
+
+/**
+ * On success, the board will be solved using a simple backtracking algorithm
+ * and then shuffled. A set number of moves will be removed from the complete
+ * board and the rest will be marked as fixed moves. If however the board was
+ * not init, then an error message will be displayed and the function will exit.
+ */
+void board_shuffle();
+
+/**
+ * On success, the rows r1 and r2 will be switched.
+ * @param r1 - row1 to be switched
+ * @param r2 - row2 to be switched
+ */
+void board_switch_rows(const int r1, const int r2);
+
+/**
+ * On success, the columns c1 and c2 will be switched.
+ * @param c1 - columns1 to be switched
+ * @param c2 - columns2 to be switched
+ */
+void board_switch_columns(const int c1, const int c2);
+
+/**
+ * Check if the board was already reinitialized or not.
+ * @return
+ */
+bool board_is_init();
+
+/**
+ * Check if the board is solved.
+ * @return
+ */
+bool board_is_solved();
 
 /**
  * move functions
@@ -235,28 +260,6 @@ void history_insert(const int val, const int x, const int y, const int val_prev,
 void history_print();
 
 /**
- * On success, the board will be solved using a simple backtracking algorithm
- * and then shuffled. A set number of moves will be removed from the complete
- * board and the rest will be marked as fixed moves. If however the board was
- * not init, then an error message will be displayed and the function will exit.
- */
-void board_shuffle();
-
-/**
- * On success, the rows r1 and r2 will be switched.
- * @param r1 - row1 to be switched
- * @param r2 - row2 to be switched
- */
-void board_switch_rows(const int r1, const int r2);
-
-/**
- * On success, the columns c1 and c2 will be switched.
- * @param c1 - columns1 to be switched
- * @param c2 - columns2 to be switched
- */
-void board_switch_columns(const int c1, const int c2);
-
-/**
  * flip global variable board_flip_error_msg_flag to true or false to allow or
  * forbid printing messages.
  */
@@ -266,6 +269,7 @@ typedef enum BOARD_ERROR {
 	ERROR_BOARD_INVALID_DIM,
 	ERROR_BOARD_NOT_INIT,
     ERROR_BOARD_ALREADY_INIT,
+    ERROR_HISTORY_NOT_INIT,
 	ERROR_MOVE_INVALID_X_BOUNDS,
 	ERROR_MOVE_INVALID_Y_BOUNDS,
 	ERROR_MOVE_INVALID_VAL_RANGE,

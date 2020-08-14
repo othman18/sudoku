@@ -17,7 +17,7 @@ void start_game() {
 	board_init(size_m, size_n);
 	board_print();
 	get_command();
-	board_free();
+	game_free();
 }
 
 void get_mn_dim(int *size_m, int *size_n) {
@@ -98,9 +98,8 @@ bool is_valid_reset(char *token_command) {
 	}
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
-		printf(RED "NOT IMPLEMENTED YET\n" DEFAULT);
-		//		board_reset();
-		//      board_print();
+		board_reset();
+		board_print();
 	}
 	return true;
 }

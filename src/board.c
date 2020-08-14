@@ -16,7 +16,7 @@ int glob_DASH_LEN = 0;          /* fixed number of dashes, set at init */
 bool glob_erro_msg_flag = true; /* allow printing messages */
 
 struct linkedlist *glob_move_history = NULL;
-struct linkedlist *glob_move_history_backup = NULL;
+struct linkedlist *glob_fixed_move_history = NULL;
 
 struct cell *cell_init() {
 	struct cell *new_cell = (struct cell *)malloc(sizeof(struct cell));
@@ -25,7 +25,7 @@ struct cell *cell_init() {
 	return new_cell;
 }
 
-/*//////////////////////////////////BOARD FUNCTIONS///////////////////////////*/
+/*///////////////////////////BOARD FUNCTIONS//////////////////////////////////*/
 
 void board_init(const int size_m, const int size_n) {
 	if (size_m * size_n < MIN_BOARD_SIZE) {
@@ -73,7 +73,7 @@ void board_free() {
 void game_free() {
 	board_free();
 	linkedlist_free(&glob_move_history);
-	linkedlist_free(&glob_move_history_backup);
+	linkedlist_free(&glob_fixed_move_history);
 }
 
 void board_print() {
@@ -133,55 +133,62 @@ void board_reset() {
 	if (!board_is_init()) {
 		return;
 	}
-	/**
-	 * todo: use save the linkedlist that will be created when shuffled, then
-	 * save it in another variable, when this function is called simply reset
-	 * the board and use the saved linkedlist to create the board.
-	 */
-	//	board_free();
-	//	board_init(glob_board_size_m, glob_board_size_n);
+	
+	if(glob_fixed_move_history == NULL){
+		board_error_handler(ERROR_HISTORY_NOT_INIT, EMPTY_ARG, EMPTY_ARG, 
+							EMPTY_ARG);
+		return;
+	}
+	
+	board_free();
+	
+	glob_board = (struct cell ***)malloc(glob_board_size * sizeof(struct cell));
+
+	for (int i = 0; i < glob_board_size; i++) {
+		glob_board[i] =
+		    (struct cell **)malloc(glob_board_size * sizeof(struct cell));
+	}
+	for (int i = 0; i < glob_board_size; i++) {
+		for (int j = 0; j < glob_board_size; j++) {
+			glob_board[i][j] = cell_init();
+		}
+	}
+	
+	struct node *current_node = glob_fixed_move_history->head;
+	while (current_node != NULL) {
+		if (current_node->move_type != MOVE_DUM) {
+			glob_board[current_node->x][current_node->y]->val = current_node->val;
+			glob_board[current_node->x][current_node->y]->mode = MODE_F;
+		}
+		current_node = current_node->next;
+	}
+	linkedlist_free(&glob_move_history);
 }
 
 void board_restart() {
 	if (!board_is_init()) {
 		return;
 	}
-	board_free();
+	game_free();
 	board_init(glob_board_size_m, glob_board_size_n);
 }
 
-bool board_is_init() {
-	if (glob_board == NULL) {
-		board_error_handler(ERROR_BOARD_NOT_INIT, EMPTY_ARG, EMPTY_ARG,
-		                    EMPTY_ARG);
-		return false;
-	}
-	return true;
-}
-
-bool board_is_solved() {
+void board_init_fixed_history(){
 	if (!board_is_init()) {
-		return false;
+		return;
 	}
-	return glob_board_set_moves == glob_board_size * glob_board_size;
+	linkedlist_init(&glob_fixed_move_history, MOVE_DUM, MOVE_DUM, MOVE_DUM, MOVE_DUM,
+					MOVE_DUM);
+	for(int i = 0; i < glob_board_size; i++){
+		for(int j = 0; j < glob_board_size; j++){
+			if(glob_board[i][j]->mode == MODE_F){
+				linkedlist_insert(glob_fixed_move_history, glob_board[i][j]->val
+				, i, j, MOVE_DUM, MOVE_INS);
+			}
+		}
+	}
+	linkedlist_print(glob_fixed_move_history, glob_fixed_move_history->tail);
 }
-
-/*
-bool board_solve_bt_help() {
-    for (int i = 0; i < glob_board_size; i++) {
-        for (int j = 0; j < glob_board_size; j++) {
-            if (glob_board[i][j]->mode == MODE_RW) {
-                printf("start solve at %d, %d\n", i, j);
-                board_flip_error_msg_flag();
-                board_solve_bt(i, j);
-                board_flip_error_msg_flag();
-                return true;
-            }
-        }
-    }
-    return false;
-}
-*/
 
 bool board_solve_bt(const int x, const int y) {
 	for (int i = 1; i <= glob_board_size; i++) {
@@ -213,7 +220,85 @@ bool board_solve_bt(const int x, const int y) {
 	return false;
 }
 
-/*//////////////////////////////////MOVE FUNCTIONS////////////////////////////*/
+void board_shuffle() {
+	if (!board_is_init()) {
+		return;
+	}
+	srand(time(NULL));
+	board_flip_error_msg_flag();
+	board_solve_bt(0, 0);
+	board_flip_error_msg_flag();
+	/*
+		this implementation is not valid, shuffle should be per block not random
+	for (int i = 0; i < glob_board_size * glob_board_size; i++) {
+		int n1 = 0, n2 = 0;
+		while (n1 == n2) {
+			n1 = rand() % glob_board_size;
+			n2 = rand() % glob_board_size;
+		}
+		int r = rand();
+		if (r % 2 == 0) {
+			board_switch_rows(n1, (n1 + glob_board_size_m) % glob_board_size_m);
+		} else {
+			board_switch_columns(n1, (n1 + glob_board_size_n) % glob_board_size_n);
+		}
+	}
+	*/
+
+	for (int i = 0; i < glob_board_size; i++) {
+		for (int j = 0; j < glob_board_size; j++) {
+			glob_board[i][j]->mode = MODE_F;
+			if (rand() % 2 == 0) {
+				glob_board[i][j]->mode = MODE_R;
+				move_remove(i, j);
+			}
+		}
+	}
+	linkedlist_free(&glob_move_history);
+	board_init_fixed_history();
+}
+
+void board_switch_rows(const int r1, const int r2) {
+	if (!board_is_init()) {
+		return;
+	}
+	// check if r1 and r2 are in bound
+	for (int i = 0; i < glob_board_size; i++) {
+		struct cell *tmp = glob_board[i][r1];
+		glob_board[i][r1] = glob_board[i][r2];
+		glob_board[i][r2] = tmp;
+	}
+}
+
+void board_switch_columns(const int c1, const int c2) {
+	if (!board_is_init()) {
+		return;
+	}
+	// check if c1 and c2 are in bound
+	for (int i = 0; i < glob_board_size; i++) {
+		struct cell *tmp = glob_board[c1][i];
+		glob_board[c1][i] = glob_board[c2][i];
+		glob_board[c2][i] = tmp;
+	}
+}
+
+bool board_is_init() {
+	if (glob_board == NULL) {
+		board_error_handler(ERROR_BOARD_NOT_INIT, EMPTY_ARG, EMPTY_ARG,
+		                    EMPTY_ARG);
+		return false;
+	}
+	return true;
+}
+
+bool board_is_solved() {
+	if (!board_is_init()) {
+		return false;
+	}
+	return glob_board_set_moves == glob_board_size * glob_board_size;
+}
+
+/*///////////////////////////MOVE FUNCTIONS///////////////////////////////////*/
 
 bool move_is_valid(const int val, const int x, const int y) {
 	return move_is_valid_coordinate(x, y) && move_is_valid_range(val) &&
@@ -429,7 +514,7 @@ void move_redo() {
 	}
 }
 
-/*////////////////////////////////HISTORY FUNCTIONS/////////////////////////*/
+/*////////////////////////////HISTORY FUNCTIONS///////////////////////////////*/
 
 void history_insert(const int val, const int x, const int y, const int val_prev,
                     const int move_type) {
@@ -452,65 +537,6 @@ void history_print() {
 	printf("\n");
 }
 
-void board_shuffle() {
-	if (!board_is_init()) {
-		return;
-	}
-	srand(time(NULL));
-	board_flip_error_msg_flag();
-	board_solve_bt(0, 0);
-	board_flip_error_msg_flag();
-
-	for (int i = 0; i < glob_board_size * glob_board_size; i++) {
-		int n1 = 0, n2 = 0;
-		while (n1 == n2) {
-			n1 = rand() % glob_board_size;
-			n2 = rand() % glob_board_size;
-		}
-		int r = rand();
-		if (r % 2 == 0) {
-			board_switch_rows(n1, n2);
-		} else {
-			board_switch_columns(n1, n2);
-		}
-	}
-
-	for (int i = 0; i < glob_board_size; i++) {
-		for (int j = 0; j < glob_board_size; j++) {
-			glob_board[i][j]->mode = MODE_F;
-			if (rand() % 2 == 0) {
-				glob_board[i][j]->mode = MODE_R;
-				move_remove(i, j);
-			}
-		}
-	}
-	linkedlist_free(&glob_move_history);
-}
-
-void board_switch_rows(const int r1, const int r2) {
-	if (!board_is_init()) {
-		return;
-	}
-	// check if r1 and r2 are in bound
-	for (int i = 0; i < glob_board_size; i++) {
-		struct cell *tmp = glob_board[i][r1];
-		glob_board[i][r1] = glob_board[i][r2];
-		glob_board[i][r2] = tmp;
-	}
-}
-
-void board_switch_columns(const int c1, const int c2) {
-	if (!board_is_init()) {
-		return;
-	}
-	// check if c1 and c2 are in bound
-	for (int i = 0; i < glob_board_size; i++) {
-		struct cell *tmp = glob_board[c1][i];
-		glob_board[c1][i] = glob_board[c2][i];
-		glob_board[c2][i] = tmp;
-	}
-}
-
 void board_flip_error_msg_flag() { glob_erro_msg_flag = !glob_erro_msg_flag; }
 
 void board_error_handler(const BOARD_ERROR err, const int arg0, const int arg1,
@@ -529,6 +555,9 @@ void board_error_handler(const BOARD_ERROR err, const int arg0, const int arg1,
 			break;
 		case (ERROR_BOARD_NOT_INIT):
 			printf("Error, board not init!\n");
+			break;
+		case (ERROR_HISTORY_NOT_INIT):
+			printf("Error, fixed move history not init!\n");
 			break;
 		case (ERROR_MOVE_INVALID_X_BOUNDS):
 			printf(
