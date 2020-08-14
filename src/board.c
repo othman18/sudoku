@@ -485,7 +485,7 @@ void board_shuffle() {
 		}
 	}
 	linkedlist_free(&glob_move_history);
-	glob_board_size = glob_board_size_m * glob_board_size_n;
+    glob_board = (struct cell ***)malloc(glob_board_size * sizeof(struct cell));
 }
 
 void board_switch_rows(const int r1, const int r2) {
