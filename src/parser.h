@@ -8,6 +8,7 @@
 #define PARSER_H_
 
 #define RESET "reset"
+#define RESTART "restart"
 #define SET "set"
 #define EDIT "edit"
 #define REMOVE "remove"
@@ -17,6 +18,7 @@
 #define CLEAR "clear"
 #define HELP "help"
 #define SOLVE "solve"
+#define PRINT "print"
 #define STARS "\t>>  "
 
 /**
@@ -40,14 +42,34 @@ void get_mn_dim(int* size_m, int* size_n);
 void get_command();
 
 /**
+ * Check if the tokenized command = EXIT.
+ * On success, the game will free every allocated memory and terminate.
+ * The function will ignore any additional arguments after validating the
+ * command EXIT
+ * @param token_command - user intered command
+ * @return
+ */
+bool is_valid_exit(char* token_command);
+
+/**
  * Check if the tokenized command  = RESET.
- * On success reset the board to the original game.
+ * On success, remove the set moves from the board.
  * If the user enters more than one argument, an error message will be
  * displayed.
  * @param token_command - user intered command
  * @return
  */
 bool is_valid_reset(char* token_command);
+
+/**
+ * Check if the tokenized command  = RESTART.
+ * On success, reset the board to the original game.
+ * If the user enters more than one argument, an error message will be
+ * displayed.
+ * @param token_command - user intered command
+ * @return
+ */
+bool is_valid_restart(char* token_command);
 
 /**
  * Check if the tokenized command  = SET VAL X Y.
@@ -106,16 +128,6 @@ bool is_valid_undo(char* token_command);
 bool is_valid_redo(char* token_command);
 
 /**
- * Check if the tokenized command = EXIT.
- * On success, the game will free every allocated memory and terminate.
- * The function will ignore any additional arguments after validating the
- * command EXIT
- * @param token_command - user intered command
- * @return
- */
-bool is_valid_exit(char* token_command);
-
-/**
  * Check if the tokenized command  = CLEAR.
  * On success, the game will clear the console.
  * If the user enters more than one argument, an error message will be
@@ -146,6 +158,16 @@ bool is_valid_help(char* token_command);
 bool is_valid_solve(char* token_command);
 
 /**
+ * Check if the tokenized command  = PRINT.
+ * On success, the board will be printed.
+ * If the user enters more than one argument, an error message will be
+ * displayed.
+ * @param token_command - user intered command
+ * @return
+ */
+bool is_valid_print(char* token_command);
+
+/**
  * Check if the given string is a number. return
  * @param token
  * @return - true if number, false otherwise
@@ -169,8 +191,8 @@ typedef enum PARSER_ERROR {
 	ERROR_INVALID_VAL,
 	ERROR_INVALID_X,
 	ERROR_INVALID_Y,
-	SUCCESS,
+	PARSE_SUCCESS,
 } PARSER_ERROR;
 
-void parser_error_handler(PARSER_ERROR err);
+void parser_error_handler(const PARSER_ERROR err);
 #endif

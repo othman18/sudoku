@@ -38,18 +38,23 @@ struct cell* cell_init();
  * @param size_m - given m dimension
  * @param size_n - given n dimension
  */
-void board_init(int size_m, int size_n);
+void board_init(const int size_m, const int size_n);
 
 /**
  * On success, the global variable glob_board will be freed. If however the
  * variable was already freed (== NULL) then the function will exit without
- * changing anything. than MIN_BOARD_SIZE, then an error message will be
- * displayed and the function will exit.
+ * changing anything.
  */
 void board_free();
 
 /**
- * On success, the function wil print the board. If the board was not
+ * On success, all global variables be freed.
+ */
+void game_free();
+
+/**
+ * On success, the function wil print the board using a seriese of dashes '-'
+ * and '|'. Fixed values will have a dot '.' at the end. If the board was not
  * initialized, then an error message will be displayed and the function will
  * exit without printing the board.
  */
@@ -62,24 +67,45 @@ void board_print();
 void board_print_dashes();
 
 /**
- * On success, the board will free the board and reinitialize it as a new board
+ * On success, any set move will be removed, and the player can start the game
+ * as new. If however the board was not initialized, then an error message will
+ * be displayed and the function will exit without altering the board.
+ */
+void board_reset();
+
+/**
+ * On success, the board will be freed reinitialize it as a new board
  * with the same dimensions as before. If however the board was not initialized,
  * then an error message will be displayed and the function will exit without
  * altering the board.
  */
-void board_reset();
+void board_restart();
 
 /**
  * Check if the board was already reinitialized or not.
  * @return
  */
 bool board_is_init();
+
+/**
+ * Check if the board is solved.
+ * @return
+ */
+bool board_is_solved();
+
+/**
+ * On success the right XY coordinate will be found for the backtracking solver
+ * to begin and then called.
+ * @return
+ */
+/* bool board_solve_bt_help(); */
+
 /**
  * On success, the function will solve the board using a backtracking algorithm.
  * @param x - X coordinate
  * @param y - Y coordinate
  */
-bool board_bt_solve(int x, int y); /* backtracking solve*/
+bool board_solve_bt(int x, int y); /* backtracking solve*/
 
 /**
  * move functions
@@ -97,7 +123,7 @@ bool board_bt_solve(int x, int y); /* backtracking solve*/
  * @param y - Y coordinate
  * @return
  */
-bool move_is_valid(int val, int x, int y);
+bool move_is_valid(const int val, const int x, const int y);
 
 /**
  * Check if the coordinates are in bounds, i.e. >= 0 && < board size
@@ -105,14 +131,14 @@ bool move_is_valid(int val, int x, int y);
  * @param y - Y coordinate
  * @return
  */
-bool move_is_valid_coordinate(int x, int y);
+bool move_is_valid_coordinate(const int x, const int y);
 
 /**
  * Check if the value is in bounds, i.e. > 0 && <= board size
  * @param val - value to be set
  * @return
  */
-bool move_is_valid_range(int val);
+bool move_is_valid_range(const int val);
 
 /**
  * Check if value is present in any cell in the horizontal line of y
@@ -120,7 +146,7 @@ bool move_is_valid_range(int val);
  * @param y - Y coordinate
  * @return
  */
-bool move_is_valid_horizontal(int val, int y);
+bool move_is_valid_horizontal(const int val, const int y);
 
 /**
  * Check if value is present in any cell in the vertical line of x
@@ -128,7 +154,7 @@ bool move_is_valid_horizontal(int val, int y);
  * @param x - X coordinate
  * @return
  */
-bool move_is_valid_vertical(int val, int x);
+bool move_is_valid_vertical(const int val, const int x);
 
 /**
  * Check if vlue is present in the current cell blocks of x and y
@@ -137,7 +163,7 @@ bool move_is_valid_vertical(int val, int x);
  * @param y - Y coordinate
  * @return
  */
-bool move_is_valid_block(int val, int x, int y);
+bool move_is_valid_block(const int val, const int x, const int y);
 
 /**
  * On success, val will be set at the coordinates (x, y). Cell will become in R
@@ -148,7 +174,7 @@ bool move_is_valid_block(int val, int x, int y);
  * @param y - Y coordinate
  * @return
  */
-void move_set(int val, int x, int y);
+void move_set(const int val, const int x, const int y);
 
 /**
  * On success, val will be set as the new val at the coordinates (x, y). Cell
@@ -160,7 +186,7 @@ void move_set(int val, int x, int y);
  * @param y - Y coordinate
  * @return
  */
-void move_edit(int val, int x, int y);
+void move_edit(const int val, const int x, const int y);
 
 /**
  * On success, the value at (x, y) will be removed and set as empty, the cell
@@ -172,7 +198,7 @@ void move_edit(int val, int x, int y);
  * @param y - Y coordinate
  * @return
  */
-void move_remove(int x, int y);
+void move_remove(const int x, const int y);
 
 /**
  * On success, reverse the last move.
@@ -200,8 +226,8 @@ void move_redo();
  * @param val_prev
  * @param move_type
  */
-void history_insert(int val, int x, int y, int val_prev,
-                    int move_type); /* 0 = insert, 1 = remove, 2 = edit */
+void history_insert(const int val, const int x, const int y, const int val_prev,
+                    const int move_type); /* 0 = insert, 1 = remove, 2 = edit */
 
 /**
  * Print move history.
@@ -209,13 +235,37 @@ void history_insert(int val, int x, int y, int val_prev,
 void history_print();
 
 /**
- * flip global variable board_flip_error_msg_flag to true or false to allow or forbid printing messages.
+ * On success, the board will be solved using a simple backtracking algorithm
+ * and then shuffled. A set number of moves will be removed from the complete
+ * board and the rest will be marked as fixed moves. If however the board was
+ * not init, then an error message will be displayed and the function will exit.
+ */
+void board_shuffle();
+
+/**
+ * On success, the rows r1 and r2 will be switched.
+ * @param r1 - row1 to be switched
+ * @param r2 - row2 to be switched
+ */
+void board_switch_rows(const int r1, const int r2);
+
+/**
+ * On success, the columns c1 and c2 will be switched.
+ * @param c1 - columns1 to be switched
+ * @param c2 - columns2 to be switched
+ */
+void board_switch_columns(const int c1, const int c2);
+
+/**
+ * flip global variable board_flip_error_msg_flag to true or false to allow or
+ * forbid printing messages.
  */
 void board_flip_error_msg_flag();
 
 typedef enum BOARD_ERROR {
 	ERROR_BOARD_INVALID_DIM,
 	ERROR_BOARD_NOT_INIT,
+    ERROR_BOARD_ALREADY_INIT,
 	ERROR_MOVE_INVALID_X_BOUNDS,
 	ERROR_MOVE_INVALID_Y_BOUNDS,
 	ERROR_MOVE_INVALID_VAL_RANGE,
@@ -228,8 +278,10 @@ typedef enum BOARD_ERROR {
 	ERROR_MOVE_INVALID_EMPTY,
 	ERROR_MOVE_INVALID_UNDO,
 	ERROR_MOVE_INVALID_REDO,
+	BOARD_SUCCESS,
 } BOARD_ERROR;
 
-void board_error_handler(BOARD_ERROR err, int arg0, int arg1, int arg2);
+void board_error_handler(const BOARD_ERROR err, const int arg0, const int arg1,
+                         const int arg2);
 
 #endif

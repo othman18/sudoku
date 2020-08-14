@@ -3,13 +3,14 @@
 
 /*//////////////////////////////////////NODE METHODS//////////////////////*/
 
-void node_init(struct node **new_node, int val, int x, int y, int val_prev,
-               int move_type, struct node *next, struct node *prev) {
+LL_ERROR node_init(struct node **new_node, const int val, const int x,
+                   const int y, const int val_prev, const int move_type,
+                   struct node *next, struct node *prev) {
 	if (*new_node == NULL) {
 		*new_node = (struct node *)malloc(sizeof(struct node));
 	} else {
 		ll_error_handler(ERROR_NODE_ALREADY_INIT);
-		return;
+		return ERROR_NODE_ALREADY_INIT;
 	}
 	(*new_node)->val = val;
 	(*new_node)->val_prev = val_prev;
@@ -18,6 +19,7 @@ void node_init(struct node **new_node, int val, int x, int y, int val_prev,
 	(*new_node)->move_type = move_type;
 	(*new_node)->next = next;
 	(*new_node)->prev = prev;
+	return LL_SUCCESS;
 }
 
 /**
@@ -42,13 +44,13 @@ void node_free(struct node *delete_node) {
 
 /*//////////////////////////////////////LINKEDLIST METHODS////////////////////*/
 
-void linkedlist_init(struct linkedlist **lst, int val, int x, int y,
-                     int val_prev, int move_type) {
+LL_ERROR linkedlist_init(struct linkedlist **lst, const int val, const int x,
+                         const int y, const int val_prev, const int move_type) {
 	if (*lst == NULL) {
 		*lst = (struct linkedlist *)malloc(sizeof(struct linkedlist));
 	} else {
 		ll_error_handler(ERROR_LL_ALREADY_INIT);
-		return;
+		return ERROR_LL_ALREADY_INIT;
 	}
 	(*lst)->head = NULL;
 	/* head node won't have any next nor prev pointers*/
@@ -56,12 +58,30 @@ void linkedlist_init(struct linkedlist **lst, int val, int x, int y,
 	/* set head, tail and current_move as the head node */
 	(*lst)->tail = (*lst)->head;
 	(*lst)->current_move = (*lst)->tail;
+	return LL_SUCCESS;
 }
 
-void linkedlist_insert(struct linkedlist *lst, int val, int x, int y,
-                       int val_prev, int move_type) {
-	if (lst == NULL || lst->head == NULL) {
+void linkedlist_free(struct linkedlist **lst) {
+	if (lst == NULL || *lst == NULL) {
 		return;
+	}
+	/* delete the whole structure by removing the tail each time*/
+	while ((*lst)->tail != NULL) {
+		linkedlist_remove_last(*lst);
+	}
+	free(*lst);
+	*lst = NULL;
+}
+
+LL_ERROR linkedlist_insert(struct linkedlist *lst, const int val, const int x,
+                           const int y, const int val_prev,
+                           const int move_type) {
+	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
+		return ERROR_LL_NOT_INIT;
+	} else if (lst->head == NULL) {
+		ll_error_handler(ERROR_LL_EMPTY);
+		return ERROR_LL_EMPTY;
 	}
 	linkedlist_remove_until_current(lst); /* set current_move as tail */
 	struct node *new_node = NULL;
@@ -71,12 +91,16 @@ void linkedlist_insert(struct linkedlist *lst, int val, int x, int y,
 	lst->tail->next = new_node; /* set new tail */
 	lst->tail = new_node;
 	lst->current_move = lst->tail;
+	return LL_SUCCESS;
 }
 
-void linkedlist_remove_last(struct linkedlist *lst) {
-	if (lst == NULL || lst->tail == NULL) {
+LL_ERROR linkedlist_remove_last(struct linkedlist *lst) {
+	if (lst == NULL) {
+		ll_error_handler(ERROR_LL_NOT_INIT);
+		return ERROR_LL_NOT_INIT;
+	} else if (lst->tail == NULL) {
 		ll_error_handler(ERROR_LL_EMPTY);
-		return;
+		return ERROR_LL_EMPTY;
 	}
 	struct node *current_node = lst->tail;
 	/* make the prev node as tail */
@@ -90,15 +114,16 @@ void linkedlist_remove_last(struct linkedlist *lst) {
 	}
 	node_free(current_node);
 	current_node = NULL;
+	return LL_SUCCESS;
 }
 
-void linkedlist_remove_until_current(struct linkedlist *lst) {
+LL_ERROR linkedlist_remove_until_current(struct linkedlist *lst) {
 	if (lst == NULL) {
 		ll_error_handler(ERROR_LL_NOT_INIT);
-		return;
+		return ERROR_LL_NOT_INIT;
 	} else if (lst->current_move == NULL) {
 		ll_error_handler(ERROR_LL_CURR_MOVE_NOT_INIT);
-		return;
+		return ERROR_LL_CURR_MOVE_NOT_INIT;
 	}
 	/* delete all nodes till current_move then set the current_move as the new
 	 * tail */
@@ -106,6 +131,7 @@ void linkedlist_remove_until_current(struct linkedlist *lst) {
 		node_free(lst->current_move->next);
 	}
 	lst->tail = lst->current_move;
+	return LL_SUCCESS;
 }
 
 bool linkedlist_forward_current(struct linkedlist *lst) {
@@ -140,12 +166,13 @@ bool linkedlist_rewind_current(struct linkedlist *lst) {
 	return true;
 }
 
-void linkedlist_print(struct linkedlist *lst, struct node *until_node) {
+LL_ERROR linkedlist_print(struct linkedlist *lst, struct node *until_node) {
 	if (lst == NULL) {
 		ll_error_handler(ERROR_LL_NOT_INIT);
-		return;
+		return ERROR_LL_NOT_INIT;
 	} else if (until_node == NULL) {
 		ll_error_handler(ERROR_NODE_NOT_INIT);
+		return ERROR_NODE_NOT_INIT;
 	}
 	struct node *current_node = lst->head;
 	while (current_node != until_node->next) {
@@ -168,21 +195,10 @@ void linkedlist_print(struct linkedlist *lst, struct node *until_node) {
 		current_node = current_node->next;
 	}
 	printf("\n");
+	return LL_SUCCESS;
 }
 
-void linkedlist_free(struct linkedlist **lst) {
-	if (lst == NULL || *lst == NULL) {
-		return;
-	}
-	/* delete the whole structure by removing the tail each time*/
-	while ((*lst)->tail != NULL) {
-		linkedlist_remove_last(*lst);
-	}
-	free(*lst);
-	*lst = NULL;
-}
-
-void ll_error_handler(LL_ERROR err) {
+void ll_error_handler(const LL_ERROR err) {
 	printf(RED);
 	switch (err) {
 		case (ERROR_NODE_ALREADY_INIT):

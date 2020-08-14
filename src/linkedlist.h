@@ -8,6 +8,7 @@
 
 #define RED "\033[0;31m"
 #define DEFAULT "\033[0m"
+#define GREEN "\033[0;32m"
 
 #define MOVE_DUM -1 /* DUMMY */
 #define MOVE_INS 0  /* INSERT */
@@ -25,10 +26,18 @@ struct node {
 	struct node *next, *prev;
 };
 
+typedef enum LL_ERROR {
+	ERROR_NODE_ALREADY_INIT,
+	ERROR_NODE_NOT_INIT,
+	ERROR_LL_ALREADY_INIT,
+	ERROR_LL_EMPTY,
+	ERROR_LL_NOT_INIT,
+	ERROR_LL_CURR_MOVE_NOT_INIT,
+	LL_SUCCESS,
+} LL_ERROR;
+
 /**
  * On success, the given node pointer will be allocated and initialized. If
- * however it was already initialized then an error message will be displayed
- * and the function will exit without altering the pointer.
  * @param new_node - given node pointer to init
  * @param val - given value
  * @param x - given X coordinate
@@ -37,9 +46,13 @@ struct node {
  * @param move_type - given move type insert/remove/edit/dummy
  * @param next - given pointer to the next node
  * @param prev - given pointer to the previous node
+ * @return
+ * ERROR_NODE_ALREADY_INIT - node already init, function will exit without
+ * altering the pointer. LL_SUCCESS - otherwise
  */
-void node_init(struct node **new_node, int val, int x, int y, int val_prev,
-               int move_type, struct node *next, struct node *prev);
+LL_ERROR node_init(struct node **new_node, const int val, const int x,
+                   const int y, const int val_prev, const int move_type,
+                   struct node *next, struct node *prev);
 
 /**
  * On success, the given node pointer will be freed. If however it was already
@@ -59,8 +72,7 @@ struct linkedlist {
 /**
  * On success, the given linkedlist pointer will be allocated and initialized,
  * then a new node will be promptly initialized and set as the linkedlist's head
- * and tail. If however it was already initialized then an error message will be
- * displayed and the function will exit without altering the pointer.
+ * and tail.
  * @param lst - given linkedlist pointer to init
  * @param val - given value for the linkedlist's head node
  * @param x - given X coordinate for the linkedlist's head node
@@ -71,17 +83,26 @@ struct linkedlist {
  * @param next - given pointer to the next node for the linkedlist's head node
  * @param prev - given pointer to the previous node for the linkedlist's head
  * node
+ * @return
+ * ERROR_LL_ALREADY_INIT - linkedlist not init, function will exit without
+ * altering the pointer. LL_SUCESS - otherwise
  */
-void linkedlist_init(struct linkedlist **lst, int val, int x, int y,
-                     int val_prev, int move_type);
+LL_ERROR linkedlist_init(struct linkedlist **lst, const int val, const int x,
+                         const int y, const int val_prev, const int move_type);
+
+/**
+ * On success, the given linkedlist pointer will be freed as well as all the
+ * nodes within the linkedlist itself. If however it was already freed or ==
+ * NULL then the function will exit without altering the pointer.
+ * @param lst - given linkedlist pointer to free
+ */
+void linkedlist_free(struct linkedlist **lst);
 
 /**
  * On success, a new node will be initialized and appended to the tail of the
  * given linkedlist pointer. Each node after current_move will be removed. The
  * linkedlist's tail's next will point to the newly created node and the newly
- * created node will become the linkedlist's tail. If however the linkedlist
- * pointer was NULL or its head was NULL then the function will exit without
- * creating a new node.
+ * created node will become the linkedlist's tail.
  * @param lst - given linkedlist pointer to insert to
  * @param val - given value for the newly appended node to the linkedlist
  * @param x - given X coordinate for the newly appended node to the linkedlist
@@ -90,26 +111,36 @@ void linkedlist_init(struct linkedlist **lst, int val, int x, int y,
  * linkedlist
  * @param move_type - given move type insert/remove/edit/dummy for the newly
  * appended node to the linkedlist
+ * @return
+ * ERROR_LL_NOT_INIT - linkedlist not init, function will exit without craeting
+ * new node. ERROR_LL_EMPTY - head not init, function will exit without craeting
+ * new node. LL_SUCESS - otherwise
  */
-void linkedlist_insert(struct linkedlist *lst, int val, int x, int y,
-                       int val_prev, int move_type);
+LL_ERROR linkedlist_insert(struct linkedlist *lst, const int val, const int x,
+                           const int y, const int val_prev,
+                           const int move_type);
 
 /**
  * On success, the linkedlist's tail will be deleted. its prev will be assigned
- * as the new linkedlist tail. If however the linkedlist pointer was NULL or its
- * tail was NULL then the function will exit without deleting any node.
- * @param lst - given linkedlist pointer to remove from
+ * as the new linkedlist tail.
+ * @param lst - given linkedlist pointer to remove last node
+ * @return
+ * ERROR_LL_NOT_INIT - linkedlist not init, function will exit without removing
+ * node. ERROR_LL_EMPTY - tail not init, function will exit withoutwithout
+ * removing node. LL_SUCESS - otherwise
  */
-void linkedlist_remove_last(struct linkedlist *lst);
+LL_ERROR linkedlist_remove_last(struct linkedlist *lst);
 
 /**
  * On success, all the nodes from the tail up untill the current_move will be
- * deleted (and freed). If however the linkedlist pointer was NULL or its
- * current_move was NULL then the function will exit without creating a new
- * node.
+ * deleted (and freed).
  * @param lst - given linkedlist pointer to remove from
+ * @return
+ * ERROR_LL_NOT_INIT - linkedlist not init, function will exit without removing
+ * any node. ERROR_LL_CURR_MOVE_NOT_INIT - current_move not init, function will
+ * exit without removing any node. LL_SUCESS - otherwise
  */
-void linkedlist_remove_until_current(struct linkedlist *lst);
+LL_ERROR linkedlist_remove_until_current(struct linkedlist *lst);
 
 /**
  * On success, the current_move pointer will be set as its next. If the
@@ -118,6 +149,7 @@ void linkedlist_remove_until_current(struct linkedlist *lst);
  * NULL then the function will exit without creating a new node.
  * @param lst - given linkedlist pointer to forward current_move from
  * @return
+ * true -
  */
 bool linkedlist_forward_current(struct linkedlist *lst);
 
@@ -140,26 +172,12 @@ bool linkedlist_rewind_current(struct linkedlist *lst);
  * creating a new node.
  * @param lst - given linkedlist pointer
  * @param until_node - given node pointer. Print from head node untill this node
+ * @return
+ * ERROR_LL_NOT_INIT -  linkedlist not init, function will exit without
+ * printing. ERROR_NODE_NOT_INIT - given param node not init, function will exit
+ * without printing. LL_SUCESS - otherwise
  */
-void linkedlist_print(struct linkedlist *lst, struct node *until_node);
+LL_ERROR linkedlist_print(struct linkedlist *lst, struct node *until_node);
 
-/**
- * On success, the given linkedlist pointer will be freed as well as all the
- * nodes within the linkedlist itself. If however it was already freed or ==
- * NULL then the function will exit without altering the pointer.
- * @param lst - given linkedlist pointer to free
- */
-void linkedlist_free(struct linkedlist **lst);
-
-typedef enum LL_ERROR {
-	ERROR_NODE_ALREADY_INIT,
-	ERROR_NODE_NOT_INIT,
-	ERROR_LL_ALREADY_INIT,
-	ERROR_LL_EMPTY,
-	ERROR_LL_NOT_INIT,
-	ERROR_LL_CURR_MOVE_NOT_INIT,
-	SUCESS,
-} LL_ERROR;
-
-void ll_error_handler(LL_ERROR err);
+void ll_error_handler(const LL_ERROR err);
 #endif /*LINKEDLIST_H_*/

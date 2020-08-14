@@ -62,37 +62,32 @@ void get_mn_dim(int *size_m, int *size_n) {
 }
 
 void get_command() {
-	printf("To list game commands, type \"help\"\n");
+	printf("\nTo list game commands, type \"help\"\n");
 	printf("Enter command: ");
 	char *command = (char *)malloc(M);
 	if (fgets(command, M, stdin) != NULL) {
 	}
-	bool print_board = true;
-
 	char *token_command =
 	    strtok(command, glob_delemeter); /* tokenize command */
 
 	if (is_valid_exit(token_command)) {
 		free(command);
 		return;
-	} else if (is_valid_set(token_command)) {
 	} else if (is_valid_reset(token_command)) {
+	} else if (is_valid_restart(token_command)) {
+	} else if (is_valid_set(token_command)) {
 	} else if (is_valid_edit(token_command)) {
 	} else if (is_valid_remove(token_command)) {
 	} else if (is_valid_undo(token_command)) {
 	} else if (is_valid_redo(token_command)) {
 	} else if (is_valid_clear(token_command)) {
-	} else if (is_valid_solve(token_command)) {
 	} else if (is_valid_help(token_command)) {
-		print_board = false;
+	} else if (is_valid_solve(token_command)) {
+	} else if (is_valid_print(token_command)) {
 	} else {
 		parser_error_handler(ERROR_INVALID_COMMAND);
-		print_board = false;
 	}
 
-	if (print_board) {
-		board_print();
-	}
 	free(command);
 	get_command();
 }
@@ -103,7 +98,21 @@ bool is_valid_reset(char *token_command) {
 	}
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
-		board_reset();
+		printf(RED "NOT IMPLEMENTED YET\n" DEFAULT);
+		//		board_reset();
+		//      board_print();
+	}
+	return true;
+}
+
+bool is_valid_restart(char *token_command) {
+	if (token_command == NULL || strcmp(token_command, RESTART)) {
+		return false;
+	}
+	/* make sure there's nothing left to tokinze */
+	if (is_command_end()) {
+		board_restart();
+		board_print();
 	}
 	return true;
 }
@@ -244,11 +253,14 @@ bool is_valid_help(char *token_command) {
 	if (is_command_end()) {
 		system("clear");
 		printf("Available commands:\n" STARS
+		       "print => print board + move history\n" STARS
 		       "set VAL:int X:int Y:int => [X][Y] = Val\n" STARS
 		       "remove X:int Y:int => [X][Y] = EMPTY\n" STARS
 		       "edit NEW_VAL:int X:int Y:int => [X][Y] = NEW_VAL\n" STARS
 		       "undo => undo last move\n" STARS "redo => redo last move\n" STARS
-		       "clear => clear terminal\n" STARS "reset => reset board\n" STARS
+		       "clear => clear terminal\n" STARS
+		       "reset => reset moves set\n" STARS
+		       "restart => restart with new board\n" STARS
 		       "exit => end program\n");
 	}
 	return true;
@@ -260,9 +272,19 @@ bool is_valid_solve(char *token_command) {
 	}
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
-        board_flip_error_msg_flag();
-		board_bt_solve(0, 0);
-        board_flip_error_msg_flag();
+		// board_solve_bt_help();
+		printf(RED "NOT IMPLEMENTED YET\n" DEFAULT);
+	}
+	return true;
+}
+
+bool is_valid_print(char *token_command) {
+	if (token_command == NULL || strcmp(token_command, PRINT)) {
+		return false;
+	}
+	/* make sure there's nothing left to tokinze */
+	if (is_command_end()) {
+		board_print();
 	}
 	return true;
 }
@@ -289,7 +311,7 @@ bool is_command_end() {
 	return true;
 }
 
-void parser_error_handler(PARSER_ERROR err) {
+void parser_error_handler(const PARSER_ERROR err) {
 	printf(RED);
 	switch (err) {
 		case (ERROR_ARGUMENT_FEW):

@@ -1,8 +1,10 @@
-TODO
-	implement dancing links approach
-	generate board
-	check if solved board
-	get hint
+TODO:
+	create solver
 	change the functions to return error type
+	fix the reset method, implementation idea already at hand
+	generate board
+	get hint
 
-BUGS 	
+	implement dancing links approach
+
+BUGS:
