@@ -14,8 +14,16 @@ void start_game() {
 	int size_m = -1, size_n = 0;
 	get_mn_dim(&size_m, &size_n);
 	system("clear");
-	board_init(size_m, size_n);
-	board_print();
+	if (game_init(size_m, size_n) != BOARD_SUCCESS) {
+		printf(RED "Error, game init failed!\nExiting game...\n" DEFAULT);
+		return;
+	}
+	printf("To list game commands, type \"help\" press Enter to start\n");
+	char *command = (char *)malloc(M);
+	if (fgets(command, M, stdin) != NULL) {
+	}
+    system("clear");
+	free(command);
 	get_command();
 	game_free();
 }
@@ -62,7 +70,7 @@ void get_mn_dim(int *size_m, int *size_n) {
 }
 
 void get_command() {
-	printf("\nTo list game commands, type \"help\"\n");
+	board_print();
 	printf("Enter command: ");
 	char *command = (char *)malloc(M);
 	if (fgets(command, M, stdin) != NULL) {
@@ -99,7 +107,6 @@ bool is_valid_reset(char *token_command) {
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
 		board_reset();
-		board_print();
 	}
 	return true;
 }
@@ -111,7 +118,6 @@ bool is_valid_restart(char *token_command) {
 	/* make sure there's nothing left to tokinze */
 	if (is_command_end()) {
 		board_restart();
-		board_print();
 	}
 	return true;
 }
@@ -252,11 +258,11 @@ bool is_valid_help(char *token_command) {
 	if (is_command_end()) {
 		system("clear");
 		printf("Available commands:\n" STARS
-		       "print => print board + move history\n" STARS
 		       "set VAL:int X:int Y:int => [X][Y] = Val\n" STARS
 		       "remove X:int Y:int => [X][Y] = EMPTY\n" STARS
 		       "edit NEW_VAL:int X:int Y:int => [X][Y] = NEW_VAL\n" STARS
 		       "undo => undo last move\n" STARS "redo => redo last move\n" STARS
+		       "print => print board + move history\n" STARS
 		       "clear => clear terminal\n" STARS
 		       "reset => reset moves set\n" STARS
 		       "restart => restart with new board\n" STARS

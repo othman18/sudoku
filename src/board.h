@@ -20,6 +20,26 @@ struct cell {
 	int val;
 };
 
+typedef enum BOARD_ERROR {
+	ERROR_BOARD_INVALID_DIM,
+	ERROR_BOARD_NOT_INIT,
+	ERROR_BOARD_ALREADY_INIT,
+	ERROR_HISTORY_NOT_INIT,
+	ERROR_MOVE_INVALID_X_BOUNDS,
+	ERROR_MOVE_INVALID_Y_BOUNDS,
+	ERROR_MOVE_INVALID_VAL_RANGE,
+	ERROR_MOVE_INVALID_VAL_HORIZONTAL,
+	ERROR_MOVE_INVALID_VAL_VERTICAL,
+	ERROR_MOVE_INVALID_VAL_BLOCK,
+	ERROR_MOVE_INVALID_ALREADY_SET,
+	ERROR_MOVE_INVALID_FIXED,
+	ERROR_MOVE_INVALID_MODE,
+	ERROR_MOVE_INVALID_EMPTY,
+	ERROR_MOVE_INVALID_UNDO,
+	ERROR_MOVE_INVALID_REDO,
+	BOARD_SUCCESS,
+} BOARD_ERROR;
+
 /**
  * The function will initialize a cell with read/write mode and a default value
  * = 0
@@ -31,14 +51,27 @@ struct cell* cell_init();
  */
 
 /**
- * On success, a mXn board will be allocated and initialized, then saved in the
- * global variable glob_board. If however the value m*n is greater than
- * MAX_BOARD_SIZE or smaller than MIN_BOARD_SIZE, then an error message will be
- * displayed and the function will exit.
+ * On success, a mXn board will be allocated and initialized.
  * @param size_m - given m dimension
  * @param size_n - given n dimension
+ * @return
+ * errors from board_init
  */
-void board_init(const int size_m, const int size_n);
+BOARD_ERROR game_init(const int size_m, const int size_n);
+
+/**
+ * On success, all global variables be freed.
+ */
+void game_free();
+
+/**
+ * @param size_m - given m dimension
+ * @param size_n - given n dimension
+ * @return
+ * ERROR_BOARD_INVALID_DIM - m*n is greater than MAX_BOARD_SIZE or smaller than
+ * MIN_BOARD_SIZE ERROR_BOARD_ALREADY_INIT
+ */
+BOARD_ERROR board_init(const int size_m, const int size_n);
 
 /**
  * On success, the global variable glob_board will be freed. If however the
@@ -46,11 +79,6 @@ void board_init(const int size_m, const int size_n);
  * changing anything.
  */
 void board_free();
-
-/**
- * On success, all global variables be freed.
- */
-void game_free();
 
 /**
  * On success, the function wil print the board using a seriese of dashes '-'
@@ -80,7 +108,6 @@ void board_reset();
  * altering the board.
  */
 void board_restart();
-
 
 void board_init_fixed_history();
 
@@ -264,26 +291,6 @@ void history_print();
  * forbid printing messages.
  */
 void board_flip_error_msg_flag();
-
-typedef enum BOARD_ERROR {
-	ERROR_BOARD_INVALID_DIM,
-	ERROR_BOARD_NOT_INIT,
-    ERROR_BOARD_ALREADY_INIT,
-    ERROR_HISTORY_NOT_INIT,
-	ERROR_MOVE_INVALID_X_BOUNDS,
-	ERROR_MOVE_INVALID_Y_BOUNDS,
-	ERROR_MOVE_INVALID_VAL_RANGE,
-	ERROR_MOVE_INVALID_VAL_HORIZONTAL,
-	ERROR_MOVE_INVALID_VAL_VERTICAL,
-	ERROR_MOVE_INVALID_VAL_BLOCK,
-	ERROR_MOVE_INVALID_ALREADY_SET,
-	ERROR_MOVE_INVALID_FIXED,
-	ERROR_MOVE_INVALID_MODE,
-	ERROR_MOVE_INVALID_EMPTY,
-	ERROR_MOVE_INVALID_UNDO,
-	ERROR_MOVE_INVALID_REDO,
-	BOARD_SUCCESS,
-} BOARD_ERROR;
 
 void board_error_handler(const BOARD_ERROR err, const int arg0, const int arg1,
                          const int arg2);

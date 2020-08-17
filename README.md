@@ -1,4 +1,4 @@
-# Sudoku Game & Solver
+# Sudoku Game
 
 #### requirements
 
@@ -22,8 +22,9 @@
 	* if last move was remove then it will get set again
 	* if last move was edit then it will get unedited
 * redo => redoes last move that was reversed by undo
+* print => print board + move history
 * clear => clears terminal
-* reset => resets board
+* reset => resets board and moves set
+* restart => restart game with new board
 * exit => ends program
 * help => displays all user commands
-

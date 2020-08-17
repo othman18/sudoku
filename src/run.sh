@@ -1,1 +1,1 @@
-make clean && make  && ./sudoku
+make clean&& make&&./sudoku
